@@ -22,6 +22,7 @@ __all__ = [
     "data",
     "search",
     "news",
+    "emotion",
     "paper",
     "portfolios",
     "crypto",

@@ -20,6 +20,11 @@ services:
       OPENTERMINALUI_PREFETCH_ENABLED: "${OPENTERMINALUI_PREFETCH_ENABLED:-${OPENSCREENS_PREFETCH_ENABLED:-0}}"
       OPENTERMINALUI_SQLITE_URL: "${OPENTERMINALUI_SQLITE_URL:-${OPENSCREENS_SQLITE_URL:-sqlite:////data/openterminalui.db}}"
       OPENTERMINALUI_CORS_ORIGINS: "${OPENTERMINALUI_CORS_ORIGINS:-http://localhost:5173,http://127.0.0.1:5173}"
+      LM_STUDIO_BASE_URL: "${LM_STUDIO_BASE_URL:-http://host.docker.internal:1234/v1}"
+      LM_STUDIO_MODEL: "${LM_STUDIO_MODEL:-google/gemma-4-26b-a4b}"
+      LM_STUDIO_ENABLED: "${LM_STUDIO_ENABLED:-true}"
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
     volumes:
       - openterminalui_data:/data
     develop:

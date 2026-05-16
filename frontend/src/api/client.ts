@@ -1722,6 +1722,51 @@ export async function fetchNewsSentimentSummary(days = 7, limit = 200): Promise<
   return data;
 }
 
+export type StockEmotionArticle = {
+  title: string;
+  source: string;
+  url: string;
+  published_at: string;
+  emotion: string;
+  emotion_intensity: number;
+  sentiment_score: number;
+  sentiment_label: string;
+  rationale: string;
+};
+
+export type StockEmotion = {
+  ticker: string;
+  engine: "lmstudio" | "fallback" | string;
+  model: string;
+  period_days: number;
+  articles_analyzed: number;
+  emotion_index: number;
+  emotion_index_label: string;
+  dominant_emotion: string;
+  sentiment_score: number;
+  sentiment_label: string;
+  confidence: number;
+  emotion_distribution: Array<{ emotion: string; count: number; share: number }>;
+  narrative: string;
+  articles: StockEmotionArticle[];
+  generated_at: string;
+};
+
+export async function fetchStockEmotion(
+  ticker: string,
+  days = 7,
+  market?: string,
+  limit = 14,
+): Promise<StockEmotion> {
+  const symbol = ticker.trim().toUpperCase();
+  // Local LLM analysis is slow; allow well beyond the 30s axios default.
+  const { data } = await api.get<StockEmotion>(`/sentiment/emotion/${encodeURIComponent(symbol)}`, {
+    params: { days, market, limit },
+    timeout: 280000,
+  });
+  return data;
+}
+
 export type QuarterlyReportApiItem = {
   id: string;
   symbol: string;

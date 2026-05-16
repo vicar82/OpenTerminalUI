@@ -34,6 +34,10 @@ class AppSettings(BaseModel):
     ai_provider: str = "openai"  # openai or ollama
     openai_api_key: str | None = None
     ollama_base_url: str = "http://localhost:11434"
+    lm_studio_base_url: str = "http://localhost:1234/v1"
+    lm_studio_model: str = "google/gemma-4-26b-a4b"
+    lm_studio_enabled: bool = True
+    lm_studio_timeout_seconds: float = 240.0
     price_cache_ttl_seconds: int = 60
     fundamentals_cache_ttl_seconds: int = 1800
 
@@ -66,6 +70,14 @@ def _parse_cors_env(raw: str | None) -> list[str] | None:
     vals = [item.strip() for item in raw.split(",")]
     vals = [item for item in vals if item]
     return vals or None
+
+
+def _as_bool(value: Any, default: bool = False) -> bool:
+    if value is None:
+        return default
+    if isinstance(value, bool):
+        return value
+    return str(value).strip().lower() in {"1", "true", "yes", "on", "y"}
 
 
 def _env(name: str, legacy_name: str | None = None) -> str | None:
@@ -190,6 +202,26 @@ def get_settings() -> AppSettings:
             _env("OPENTERMINALUI_OLLAMA_BASE_URL")
             or _env("OLLAMA_BASE_URL")
             or app_cfg.get("ollama_base_url", "http://localhost:11434")
+        ),
+        lm_studio_base_url=(
+            _env("OPENTERMINALUI_LM_STUDIO_BASE_URL")
+            or _env("LM_STUDIO_BASE_URL")
+            or app_cfg.get("lm_studio_base_url", "http://localhost:1234/v1")
+        ),
+        lm_studio_model=(
+            _env("OPENTERMINALUI_LM_STUDIO_MODEL")
+            or _env("LM_STUDIO_MODEL")
+            or app_cfg.get("lm_studio_model", "google/gemma-4-26b-a4b")
+        ),
+        lm_studio_enabled=_as_bool(
+            _env("OPENTERMINALUI_LM_STUDIO_ENABLED")
+            or _env("LM_STUDIO_ENABLED")
+            or app_cfg.get("lm_studio_enabled", True),
+            default=True,
+        ),
+        lm_studio_timeout_seconds=float(
+            _env("OPENTERMINALUI_LM_STUDIO_TIMEOUT_SECONDS")
+            or app_cfg.get("lm_studio_timeout_seconds", 30.0)
         ),
         price_cache_ttl_seconds=int(
             _env("OPENTERMINALUI_PRICE_CACHE_TTL_SECONDS")

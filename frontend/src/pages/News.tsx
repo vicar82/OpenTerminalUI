@@ -2,7 +2,8 @@ import { useEffect, useMemo, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { Line, LineChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
 
-import { fetchLatestNews, fetchMarketSentiment, fetchNewsByTicker, fetchNewsSentiment, fetchNewsSentimentSummary, searchLatestNews, type NewsLatestApiItem } from "../api/client";
+import { fetchLatestNews, fetchMarketSentiment, fetchNewsByTicker, fetchNewsSentiment, fetchNewsSentimentSummary, fetchStockEmotion, searchLatestNews, type NewsLatestApiItem } from "../api/client";
+import { EmotionIndicator } from "../components/terminal/EmotionIndicator";
 import { SentimentBadge } from "../components/terminal/SentimentBadge";
 import { useStock } from "../hooks/useStocks";
 import { useStockStore } from "../store/stockStore";
@@ -269,6 +270,13 @@ export function NewsPage() {
     refetchInterval: 60_000,
     refetchOnWindowFocus: true,
   });
+  const emotionQuery = useQuery({
+    queryKey: ["stock-emotion", currentTicker, periodDays, String(selectedStock?.exchange || "")],
+    queryFn: () => fetchStockEmotion(currentTicker, periodDays, String(selectedStock?.exchange || "")),
+    enabled: isTickerMode && Boolean(currentTicker),
+    staleTime: 120_000,
+    refetchInterval: 300_000,
+  });
 
   const normalizedItems = useMemo(() => {
     const raw = newsQuery.data?.items ?? [];
@@ -281,8 +289,11 @@ export function NewsPage() {
     const relevant = scored.filter((x) => x.score >= 3).map((x) => x.item);
 
     if (relevant.length > 0) return relevant;
+    // Backend ticker feed is already symbol-scoped; trust it as-is.
     if (newsQuery.data?.sourceMode === "by_ticker") return mapped;
-    return mapped.slice(0, 40);
+    // Search/latest fallbacks are not ticker-specific — show nothing rather
+    // than generic market news when a specific ticker is selected.
+    return [];
   }, [currentTicker, isTickerMode, newsQuery.data?.items, newsQuery.data?.sourceMode, relevanceAliases]);
 
   useEffect(() => {
@@ -528,6 +539,15 @@ export function NewsPage() {
           </div>
         ) : null}
       </section>
+
+      {isTickerMode && currentTicker && (
+        <EmotionIndicator
+          ticker={currentTicker}
+          data={emotionQuery.data}
+          isLoading={emotionQuery.isLoading}
+          isError={emotionQuery.isError}
+        />
+      )}
 
       {(newsQuery.isLoading || (isTickerMode && sentimentQuery.isLoading)) && (
         <div className="space-y-2">

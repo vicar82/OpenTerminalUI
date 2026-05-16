@@ -188,9 +188,11 @@ OpenTerminalUI is a self-hosted, full-stack financial terminal that combines rea
 
 ### News & Sentiment
 
-- **Ticker-Specific News** &mdash; per-symbol news feed with multi-period filtering
+- **Ticker-Specific News** &mdash; per-symbol news feed with multi-period filtering, scoped strictly to the selected ticker
 - **Sentiment Analysis** &mdash; bullish/bearish/neutral classification with confidence scores
 - **Market-Wide Feed** &mdash; latest headlines with source attribution and sentiment trends
+- **AI Emotion Indicator** &mdash; per-stock fear/greed gauge powered by a locally hosted **Gemma** model via **LM Studio**, surfacing a 0&ndash;100 emotion index, dominant emotion (panic &rarr; euphoria), emotion mix, and per-article bullish/bearish breakdown
+- **Local & Private** &mdash; LLM sentiment runs entirely on your own machine; gracefully falls back to the lexical/FinBERT engine when LM Studio is offline
 
 ### Plugin System & Scripting
 
@@ -344,6 +346,86 @@ The platform runs without API keys using fallback providers. Add keys to unlock 
 | `REDIS_URL` | Redis connection for caching and pub/sub |
 | `OPENTERMINALUI_CORS_ORIGINS` | Allowed CORS origins |
 | `OPENTERMINALUI_PREFETCH_ENABLED` | Enable background data prefetch |
+| `LM_STUDIO_BASE_URL` | LM Studio OpenAI-compatible endpoint (default `http://localhost:1234/v1`; use `http://host.docker.internal:1234/v1` from Docker) |
+| `LM_STUDIO_MODEL` | Gemma model id loaded in LM Studio (default `google/gemma-4-26b-a4b`) |
+| `LM_STUDIO_ENABLED` | Toggle the LLM emotion analysis (default `true`; falls back to lexical sentiment when off) |
+
+## AI News Sentiment with Gemma 4 (LM Studio)
+
+OpenTerminalUI integrates a locally hosted **Google Gemma 4** model, served through
+[LM Studio](https://lmstudio.ai/), to power the per-stock **AI Emotion Indicator**
+on the News workspace. The model reads recent headlines for a ticker and returns a
+structured judgement &mdash; sentiment, confidence, and a market emotion &mdash; which
+the backend aggregates into a 0&ndash;100 fear/greed index, a dominant emotion, an
+emotion mix, and per-article bullish/bearish signals. All inference runs on your own
+machine; no news or prompt data leaves your hardware.
+
+### How it works
+
+```
+News (DB / Yahoo / Google RSS)
+        │
+        ▼
+backend/services/stock_emotion.py ──▶ backend/services/lm_studio_client.py
+   (batch prompt + JSON schema)          (OpenAI-compatible /v1/chat/completions)
+        │                                          │
+        │                                          ▼
+        │                                   LM Studio  ·  Gemma 4
+        ▼
+GET /api/sentiment/emotion/{ticker}  ──▶  Emotion Indicator (News page)
+```
+
+- All articles for a ticker are analyzed in a **single batched request** (large local
+  models are slow &mdash; per-article calls would pay the latency N times over).
+- The request uses LM Studio **structured output** (`json_schema`) so the model is
+  constrained to valid, parseable JSON.
+- If LM Studio is disabled or unreachable, the feature **falls back** to the built-in
+  lexical / FinBERT sentiment engine, so the endpoint always returns a result.
+
+### Integration procedure
+
+1. **Install LM Studio** &mdash; download from [lmstudio.ai](https://lmstudio.ai/) (macOS,
+   Windows, Linux).
+2. **Download a Gemma model** &mdash; in LM Studio's *Discover* tab, search for and
+   download a **Gemma** model (e.g. `google/gemma-4-26b-a4b`, or a smaller Gemma
+   variant for faster responses).
+3. **Load the model and start the server** &mdash; load the model, open the
+   *Developer / Local Server* tab, and click **Start Server**. It listens on
+   `http://localhost:1234` and exposes the OpenAI-compatible API at `/v1`.
+4. **Note the model id** &mdash; copy the exact model id shown by LM Studio
+   (visible at `http://localhost:1234/v1/models`); you will set it as `LM_STUDIO_MODEL`.
+5. **Configure OpenTerminalUI**:
+   - **Local development** &mdash; add to `.env` (defaults already point at localhost):
+     ```bash
+     LM_STUDIO_BASE_URL=http://localhost:1234/v1
+     LM_STUDIO_MODEL=google/gemma-4-26b-a4b
+     LM_STUDIO_ENABLED=true
+     ```
+   - **Docker** &mdash; the container must reach LM Studio on the *host*. `docker-compose.yml`
+     already defaults `LM_STUDIO_BASE_URL` to `http://host.docker.internal:1234/v1` and
+     maps `host.docker.internal`. Override `LM_STUDIO_MODEL` via `.env` if your model id
+     differs.
+6. **Restart the backend** (or `docker compose up -d`) so the new settings load.
+7. **Verify** &mdash; open the **News** workspace, select any ticker, and check the
+   *Emotion Indicator* badge:
+   - `Gemma · <model id>` &mdash; the model is live and analyzing.
+   - `Lexical fallback` &mdash; LM Studio was unreachable; the built-in engine was used.
+
+### Configuration
+
+| Variable | Default | Purpose |
+|----------|---------|---------|
+| `LM_STUDIO_BASE_URL` | `http://localhost:1234/v1` | LM Studio OpenAI-compatible endpoint. Use `http://host.docker.internal:1234/v1` from Docker. |
+| `LM_STUDIO_MODEL` | `google/gemma-4-26b-a4b` | Model id loaded in LM Studio. Must match exactly. |
+| `LM_STUDIO_ENABLED` | `true` | Master toggle for LLM emotion analysis. |
+| `LM_STUDIO_TIMEOUT_SECONDS` | `240` | Per-request timeout for the model call. |
+
+These can also be set under `app:` in `config/settings.yaml`.
+
+> **Performance:** large models such as `gemma-4-26b-a4b` are slow on consumer
+> hardware &mdash; the first analysis for a ticker can take a minute or more (results
+> are then cached). For a snappier experience, load a smaller Gemma / instruct model
+> in LM Studio and point `LM_STUDIO_MODEL` at it.
 
 ## Testing
 
