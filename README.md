@@ -47,12 +47,22 @@ OpenTerminalUI is a self-hosted, full-stack financial terminal that combines rea
 <p align="center">
   <img src="assets/screenshots/chart-workstation.png" alt="Chart Workstation" width="900" />
 </p>
-<p align="center"><em>Multi-panel chart workstation with synchronized crosshairs, 70+ technical indicators, and drawing tools.</em></p>
+<p align="center"><em>Multi-panel chart workstation — a 6-chart grid with synchronized crosshairs, 70+ technical indicators, and drawing tools.</em></p>
+
+<p align="center">
+  <img src="assets/screenshots/market-view.png" alt="Market View" width="900" />
+</p>
+<p align="center"><em>Full-screen market view — candlestick price action with volume, multi-timeframe, and indicator overlays.</em></p>
 
 <p align="center">
   <img src="assets/screenshots/stock-detail.png" alt="Security Hub" width="900" />
 </p>
 <p align="center"><em>Security Hub — quotes, fundamentals, price chart, analysis tabs, and the AI Catalyst &amp; Conviction panel.</em></p>
+
+<p align="center">
+  <img src="assets/screenshots/financial-analysis.png" alt="Financial Analysis" width="900" />
+</p>
+<p align="center"><em>Financial analysis — income statement, balance sheet, and cash-flow statements with multi-period trends.</em></p>
 
 <p align="center">
   <img src="assets/screenshots/fno-option-chain.png" alt="F&O Option Chain" width="900" />

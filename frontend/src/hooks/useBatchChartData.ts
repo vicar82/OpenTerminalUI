@@ -80,7 +80,13 @@ export function useBatchChartData(slots: ChartSlot[]): Result {
           const next = { ...prev };
           for (const item of requestItems) {
             const directKey = item.key;
-            const maybeRaw = (dataMap[directKey] ?? dataMap[item.symbol] ?? dataMap[`${item.market}:${item.symbol}`]) as
+            // The backend keys batch results as MARKET:SYMBOL|interval|range|ext=bool
+            // (see _batch_result_key); the parallel fallback uses the same shape.
+            const backendKey = `${item.market}:${item.symbol}|${item.interval}|${item.range}|ext=${item.extended ? "true" : "false"}`;
+            const maybeRaw = (dataMap[backendKey] ??
+              dataMap[directKey] ??
+              dataMap[item.symbol] ??
+              dataMap[`${item.market}:${item.symbol}`]) as
               | BatchChartPayload
               | undefined;
             const payloadError =
