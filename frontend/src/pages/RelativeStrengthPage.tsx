@@ -20,16 +20,16 @@ export function RelativeStrengthPage() {
     setLoading(true);
     try {
       if (activeTab === "rankings") {
-        const res = await api.get(`/api/rs/rankings?universe=${universe}`);
+        const res = await api.get(`/rs/rankings?universe=${universe}`);
         setRankings(res.data);
       } else if (activeTab === "sector") {
-        const res = await api.get("/api/rs/sector-rs");
+        const res = await api.get("/rs/sector-rs");
         setSectorRS(res.data);
       } else if (activeTab === "chart") {
-        const res = await api.get(`/api/rs/chart/${symbol}`);
+        const res = await api.get(`/rs/chart/${symbol}`);
         setChartData(res.data);
       } else if (activeTab === "highs") {
-        const res = await api.get("/api/rs/new-highs");
+        const res = await api.get("/rs/new-highs");
         setHighs(res.data);
       }
     } catch (e) {

@@ -53,6 +53,10 @@ api_router.include_router(ai_router, prefix="/api")
 # These routers already carry their full "/api/..." prefix internally,
 # so they must be included WITHOUT an extra prefix (avoids "/api/api/...").
 api_router.include_router(analytics_router)
+# correlation router carries its own "/api/correlation" prefix. It was imported but never
+# mounted, leaving the Correlation Dashboard's POST /api/correlation/{matrix,rolling,clusters}
+# a 405 (every matrix/rolling/cluster request failed).
+api_router.include_router(correlation_router)
 api_router.include_router(fno_flow_router)
 api_router.include_router(heatmap_router, prefix="/api/heatmap")
 api_router.include_router(journal_router, prefix="/api/journal")

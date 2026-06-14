@@ -41,7 +41,10 @@ export async function fetchCryptoDominance(): Promise<CryptoDominanceResponse> {
 }
 
 export async function fetchCryptoIndex(topN = 10): Promise<CryptoIndexResponse> {
-  const { data } = await api.get<CryptoIndexResponse>(`/v1/crypto/index/${topN}`);
+  // Backend expects top_n as a query param (GET /v1/crypto/index?top_n=). Using a path
+  // segment (/index/10) misses the route, hits the SPA catch-all, and returns HTML — which
+  // then crashes the page on indexQuery.data.index_value.toFixed (undefined).
+  const { data } = await api.get<CryptoIndexResponse>(`/v1/crypto/index?top_n=${topN}`);
   return data;
 }
 

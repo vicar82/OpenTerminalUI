@@ -20,10 +20,10 @@ export function ExportButton({ source, data, filename, disabled }: ExportButtonP
       const fname = filename || `${source}_export_${new Date().toISOString().split("T")[0]}.${format === "csv" ? "csv" : "xlsx"}`;
       
       if (format === "csv") {
-        const res = await api.post("/api/export/csv", { source, data, filename: fname }, { responseType: "blob" });
+        const res = await api.post("/export/csv", { source, data, filename: fname }, { responseType: "blob" });
         downloadBlob(res.data, fname);
       } else {
-        const res = await api.post("/api/export/excel", { source, sheets: { [source]: data }, filename: fname }, { responseType: "blob" });
+        const res = await api.post("/export/excel", { source, sheets: { [source]: data }, filename: fname }, { responseType: "blob" });
         downloadBlob(res.data, fname);
       }
     } catch (e) {

@@ -25,7 +25,7 @@ export function APIKeyManager() {
 
   const loadKeys = async () => {
     try {
-      const res = await api.get("/api/settings/api-keys");
+      const res = await api.get("/settings/api-keys");
       setKeys(Array.isArray(res.data) ? res.data : []);
     } catch (e) {
       console.error("Failed to load API keys", e);
@@ -39,7 +39,7 @@ export function APIKeyManager() {
     if (!newKeyName) return;
     setLoading(true);
     try {
-      const res = await api.post("/api/settings/api-keys", { name: newKeyName });
+      const res = await api.post("/settings/api-keys", { name: newKeyName });
       setGeneratedKey(res.data.key);
       setShowModal(true);
       setNewKeyName("");
@@ -54,7 +54,7 @@ export function APIKeyManager() {
   const revokeKey = async (id: number) => {
     if (!confirm("Are you sure you want to revoke this API key?")) return;
     try {
-      await api.delete(`/api/settings/api-keys/${id}`);
+      await api.delete(`/settings/api-keys/${id}`);
       void loadKeys();
     } catch (e) {
       console.error("Failed to revoke API key", e);

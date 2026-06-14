@@ -19,16 +19,16 @@ export function DividendDashboardPage() {
     setLoading(true);
     try {
       if (activeTab === "calendar") {
-        const res = await api.get("/api/dividends/calendar");
+        const res = await api.get("/dividends/calendar");
         setCalendar(res.data);
       } else if (activeTab === "income") {
-        const res = await api.get("/api/dividends/portfolio-income");
+        const res = await api.get("/dividends/portfolio-income");
         setIncome(res.data);
       } else if (activeTab === "analysis") {
-        const res = await api.get(`/api/dividends/history/${symbol}`);
+        const res = await api.get(`/dividends/history/${symbol}`);
         setHistory(res.data);
       } else if (activeTab === "aristocrats") {
-        const res = await api.get("/api/dividends/aristocrats");
+        const res = await api.get("/dividends/aristocrats");
         setAristocrats(res.data);
       }
     } catch (e) {

@@ -16,7 +16,7 @@ export function DataManager() {
     setLoading(true);
     setError(null);
     try {
-      const res = await api.get("/api/v1/backtest/data/catalog");
+      const res = await api.get("/v1/backtest/data/catalog");
       const data = res.data as { items?: CatalogItem[] };
       setItems(Array.isArray(data.items) ? data.items : []);
     } catch (e) {

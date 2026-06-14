@@ -25,8 +25,8 @@ export function DataQualityDashboard() {
     setLoading(true);
     try {
       const [h, b] = await Promise.all([
-        api.get("/api/admin/data-quality/health"),
-        api.get("/api/admin/data-quality/backfill-status")
+        api.get("/admin/data-quality/health"),
+        api.get("/admin/data-quality/backfill-status")
       ]);
       setHealth(h.data);
       setBackfill(b.data);
