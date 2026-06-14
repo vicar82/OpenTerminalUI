@@ -14,7 +14,7 @@ from backend.api.deps import get_db
 from backend.auth.deps import get_current_user
 from backend.models import JournalEntry, User
 
-router = APIRouter()
+router = APIRouter(prefix="/api/journal", tags=["journal"])
 
 _ALLOWED_DIRECTIONS = {"LONG", "SHORT"}
 _DAY_NAMES = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"]

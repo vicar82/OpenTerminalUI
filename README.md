@@ -9,7 +9,7 @@
 </p>
 
 <p align="center">
-  <img src="https://img.shields.io/badge/version-0.3.0-0f172a" alt="Version 0.3.0" />
+  <img src="https://img.shields.io/badge/version-0.4.0-0f172a" alt="Version 0.4.0" />
   <img src="https://img.shields.io/badge/python-3.11-3776AB?logo=python&logoColor=white" alt="Python 3.11" />
   <img src="https://img.shields.io/badge/node-22-339933?logo=node.js&logoColor=white" alt="Node 22" />
   <img src="https://img.shields.io/badge/FastAPI-009688?logo=fastapi&logoColor=white" alt="FastAPI" />
@@ -33,7 +33,7 @@
 
 OpenTerminalUI is a self-hosted, full-stack financial terminal that combines real-time market data, institutional-grade charting, derivatives analytics, portfolio management, and quant research into a single platform. Built with a terminal-style shell interface inspired by Bloomberg and Refinitiv, it delivers professional-grade workflows to anyone with a browser.
 
-**Multi-market coverage** across NSE, BSE, NYSE, NASDAQ, crypto, commodities, forex, bonds, ETFs, and mutual funds. **70+ technical indicators**, **multi-panel chart workstations**, **F&O option chains with live Greeks**, **backtesting with Model Lab**, **portfolio analytics with risk engine**, and an **extensible plugin system** &mdash; all running on your own hardware.
+**Multi-market coverage** across NSE, BSE, NYSE, NASDAQ, crypto, commodities, forex, bonds, ETFs, and mutual funds. **70+ technical indicators**, **multi-panel chart workstations**, **F&O option chains with live Greeks**, **backtesting with Model Lab**, **statistical arbitrage with Pair Trading Lab**, **portfolio analytics with risk engine**, and an **extensible plugin system** &mdash; all running on your own hardware.
 
 ## Screenshots
 
@@ -214,7 +214,8 @@ OpenTerminalUI is a self-hosted, full-stack financial terminal that combines rea
 
 ### Backtesting & Model Lab
 
-- **10+ Strategy Templates** &mdash; SMA/EMA crossover, mean reversion, breakout, RSI, MACD, Bollinger Bands, dual momentum, VWAP reversion
+- **16+ Strategy Templates** &mdash; SMA/EMA crossover, mean reversion, breakout, RSI, MACD, Bollinger Bands, dual momentum, VWAP reversion, Awesome Oscillator, Heikin-Ashi, Parabolic SAR, Dual Thrust, shooting star reversal, and Bollinger W/M patterns
+- **Pair Trading Lab** &mdash; cointegration screening, hedge-ratio estimation, spread z-score diagnostics, half-life analysis, and mean-reversion trade simulations for statistical arbitrage workflows
 - **Intraday & Daily Testing** &mdash; 1m to monthly resolution with session-aware logic
 - **Vectorized Engine** &mdash; NumPy-based computation for fast large-dataset backtests
 - **Realistic Execution** &mdash; slippage, commission, partial fills, latency, and market impact simulation
