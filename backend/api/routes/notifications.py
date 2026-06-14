@@ -10,7 +10,7 @@ from sqlalchemy.orm import Session
 from backend.api.deps import get_db
 from backend.models.notification import Notification
 
-router = APIRouter()
+router = APIRouter(prefix="/api/notifications", tags=["notifications"])
 
 NotificationType = Literal["alert", "news", "system", "trade"]
 NotificationPriority = Literal["low", "medium", "high", "critical"]
