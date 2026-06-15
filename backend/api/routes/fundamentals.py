@@ -58,8 +58,18 @@ async def shareholding(ticker: str) -> dict:
 
 @router.get("/stocks/{ticker}/corporate-actions")
 async def corporate_actions(ticker: str) -> dict:
+    symbol = ticker.strip().upper()
     fetcher = await get_unified_fetcher()
-    return await fetcher.fetch_corporate_actions(ticker.strip().upper())
+    try:
+        return await fetcher.fetch_corporate_actions(symbol)
+    except Exception as exc:
+        # Upstream (e.g. NSE) can return 403/timeout; degrade gracefully instead of 500.
+        return {
+            "ticker": symbol,
+            "corporate_actions": [],
+            "raw": {},
+            "warning": f"Corporate actions unavailable: {exc}",
+        }
 
 
 @router.get("/stocks/{ticker}/analyst-consensus")
