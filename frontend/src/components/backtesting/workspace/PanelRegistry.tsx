@@ -12,7 +12,8 @@ export type PanelId =
   | "surface3d"
   | "terrain3d"
   | "regime3d"
-  | "robustness";
+  | "robustness"
+  | "sweep";
 
 export type PanelRendererMap = Record<PanelId, () => JSX.Element>;
 
@@ -29,6 +30,7 @@ export const PANEL_LABELS: Record<PanelId, string> = {
   terrain3d: "3D Drawdown Terrain",
   regime3d: "3D Regime Efficacy",
   robustness: "Backtest Robustness",
+  sweep: "Parameter Sweep",
 };
 
 export function renderPanel(id: PanelId, renderers: PanelRendererMap): JSX.Element {

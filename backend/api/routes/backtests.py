@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import asyncio
 from typing import Any
 
 from fastapi import APIRouter, HTTPException
@@ -9,10 +10,12 @@ from backend.core.backtest_analytics import compute_full_analytics
 from backend.core.backtest_robustness import permutation_test, multi_window_robustness
 from backend.core.data_store import list_store_items, write_equity_curve
 from backend.core.factor_analysis import run_factor_decomposition
+from backend.core.historical_data_service import get_historical_data_service
 from backend.core.monte_carlo import run_monte_carlo_simulation
 from backend.core.param_optimizer import optimize_strategy_parameters
 from backend.core.portfolio_backtest import run_portfolio_backtest
 from backend.core.strategy_runner import get_strategy_catalog
+from backend.core.vectorized_backtest import vectorized_sweep
 from backend.core.walk_forward import run_walk_forward_validation
 from backend.services.backtest_jobs import BacktestJobRequest, get_backtest_job_service
 
@@ -77,6 +80,18 @@ class OptimizePayload(BaseModel):
     param_space: dict[str, list[Any]] = Field(default_factory=dict)
     max_trials: int = Field(64, ge=1, le=256)
     config: dict[str, Any] | None = None
+
+
+class VectorizedSweepPayload(BaseModel):
+    symbol: str = Field(min_length=1)
+    market: str = "NSE"
+    strategy: str = "sma_crossover"   # sma_crossover | ema_crossover | rsi_threshold
+    start: str | None = None
+    end: str | None = None
+    limit: int = Field(750, ge=30, le=5000)
+    param_grid: dict[str, list[Any]] = Field(default_factory=dict)
+    sort_by: str = "sharpe"
+    top_n: int = Field(100, ge=1, le=500)
 
 
 class PortfolioSubmitPayload(BaseModel):
@@ -225,6 +240,30 @@ async def backtest_robustness(
             "multi_window": multi_window_robustness(equity_curve, n_windows=n_windows),
         },
     }
+
+
+@router.post("/backtests/vectorized-sweep")
+async def vectorized_backtest_sweep(payload: VectorizedSweepPayload) -> dict[str, Any]:
+    strategy = payload.strategy.split(":", 1)[1] if payload.strategy.startswith("example:") else payload.strategy
+    if strategy not in ("sma_crossover", "ema_crossover", "rsi_threshold"):
+        raise HTTPException(status_code=400, detail="Unsupported strategy for vectorized sweep")
+    if not payload.param_grid:
+        raise HTTPException(status_code=400, detail="param_grid is required")
+
+    def _work() -> dict[str, Any]:
+        svc = get_historical_data_service()
+        _, bars = svc.fetch_daily_ohlcv(
+            raw_symbol=payload.symbol, market=payload.market,
+            start=payload.start, end=payload.end, limit=payload.limit,
+        )
+        prices = [{"date": str(b.date), "close": float(b.close)} for b in bars]
+        return vectorized_sweep(prices, strategy, payload.param_grid, sort_by=payload.sort_by, top_n=payload.top_n)
+
+    try:
+        sweep = await asyncio.to_thread(_work)
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Vectorized sweep failed: {e}")
+    return {"symbol": payload.symbol, "market": payload.market, "strategy": strategy, "sweep": sweep}
 
 
 # Pro v1 compatibility endpoints (blueprint adapter layer)

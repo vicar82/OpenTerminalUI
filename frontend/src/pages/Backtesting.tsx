@@ -47,6 +47,7 @@ import { terminalColors } from "../theme/terminal";
 import { consumePendingSavedView } from "../workspace/savedViewRestore";
 
 import { RobustnessPanel, type RobustnessData } from "../components/backtesting/panels/RobustnessPanel";
+import { SweepPanel } from "../components/backtesting/panels/SweepPanel";
 
 type JobState = "idle" | "queued" | "running" | "done" | "failed";
 type BacktestTimeframe = "1D" | "1W" | "1M";
@@ -62,7 +63,8 @@ type VizTab =
   | "trades"
   | "compare"
   | "surface3d"
-  | "robustness";
+  | "robustness"
+  | "sweep";
 
 type StrategyDef = {
   key: string;
@@ -163,6 +165,7 @@ const VIZ_TABS: { key: VizTab; label: string; icon: string }[] = [
   { key: "compare", label: "Compare", icon: "CMP" },
   { key: "surface3d", label: "3D Surface", icon: "3D" },
   { key: "robustness", label: "Robustness", icon: "" },
+  { key: "sweep", label: "Param Sweep", icon: "" },
 ];
 
 const CUSTOM_STRATEGY_VALUE = "custom";
@@ -429,7 +432,7 @@ export function BacktestingPage() {
     if (typeof filters.start === "string") setStart(filters.start);
     if (typeof filters.end === "string") setEnd(filters.end);
     if (typeof filters.strategyMode === "string") setStrategyMode(filters.strategyMode);
-    if (tabs.activeTab === "chart" || tabs.activeTab === "equity" || tabs.activeTab === "drawdown" || tabs.activeTab === "monthly" || tabs.activeTab === "rolling" || tabs.activeTab === "metrics" || tabs.activeTab === "trades" || tabs.activeTab === "compare" || tabs.activeTab === "surface3d" || tabs.activeTab === "robustness") setActiveTab(tabs.activeTab);
+    if (tabs.activeTab === "chart" || tabs.activeTab === "equity" || tabs.activeTab === "drawdown" || tabs.activeTab === "monthly" || tabs.activeTab === "rolling" || tabs.activeTab === "metrics" || tabs.activeTab === "trades" || tabs.activeTab === "compare" || tabs.activeTab === "surface3d" || tabs.activeTab === "robustness" || tabs.activeTab === "sweep") setActiveTab(tabs.activeTab);
   }, []);
   const [compareStrategies, setCompareStrategies] = useState<string[]>([]);
   const [compareResults, setCompareResults] = useState<Map<string, CompareState>>(new Map());
@@ -1501,6 +1504,10 @@ export function BacktestingPage() {
     <RobustnessPanel data={robustness} loading={robustnessLoading} />
   );
 
+  const renderSweepTab = () => (
+    <SweepPanel symbol={symbol} market={market} />
+  );
+
   const renderActiveTab = () => {
     if (analyticsLoading && activeTab !== "chart" && activeTab !== "compare" && !resolvedAnalytics.monthly_returns.length) return emptyState("*", "Loading analytics...");
     if (activeTab === "chart") return renderChartTab();
@@ -1512,6 +1519,7 @@ export function BacktestingPage() {
     if (activeTab === "trades") return renderTradesTab();
     if (activeTab === "compare") return renderCompareTab();
     if (activeTab === "robustness") return renderRobustnessTab();
+    if (activeTab === "sweep") return renderSweepTab();
     return renderSurface3DTab();
   };
 
@@ -1528,6 +1536,7 @@ export function BacktestingPage() {
     terrain3d: renderTerrain3DTab,
     regime3d: renderRegime3DTab,
     robustness: renderRobustnessTab,
+    sweep: renderSweepTab,
   };
 
   const handleWorkspaceCommand = (command: string) => {
