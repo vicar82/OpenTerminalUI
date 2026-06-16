@@ -20,6 +20,19 @@ describe("agentStore.applyEvent", () => {
     expect(assistant.steps).toEqual([{ id: "c1", name: "screen_stocks", isError: false }]);
   });
 
+  it("tool_result marks the step errored without mutating the prior step object", () => {
+    const s = useAgentStore.getState();
+    s.appendUserAndPending("x");
+    s.applyEvent({ type: "tool_call", id: "c1", name: "screen_stocks", arguments: {} });
+    const priorStep = useAgentStore.getState().messages.at(-1)!.steps[0];
+    s.applyEvent({ type: "tool_result", id: "c1", name: "screen_stocks", result: {}, is_error: true });
+    const newStep = useAgentStore.getState().messages.at(-1)!.steps[0];
+    expect(newStep.isError).toBe(true);
+    // The previous-state object must be untouched (referential immutability).
+    expect(priorStep.isError).toBe(false);
+    expect(newStep).not.toBe(priorStep);
+  });
+
   it("artifact event pushes an artifact", () => {
     useAgentStore.getState().appendUserAndPending("x");
     useAgentStore.getState().applyEvent({

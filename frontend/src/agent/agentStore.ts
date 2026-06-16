@@ -58,8 +58,9 @@ export const useAgentStore = create<AgentState>((set, get) => ({
           msg.steps.push({ id: event.id, name: event.name, isError: false });
           break;
         case "tool_result": {
-          const step = msg.steps.find((st) => st.id === event.id);
-          if (step) step.isError = event.is_error;
+          // Replace the step object (don't mutate the shared prior-state object).
+          const si = msg.steps.findIndex((st) => st.id === event.id);
+          if (si !== -1) msg.steps[si] = { ...msg.steps[si], isError: event.is_error };
           break;
         }
         case "token":
