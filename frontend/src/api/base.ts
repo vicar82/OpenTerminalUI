@@ -11,6 +11,10 @@ export function setAccessTokenGetter(getter: (() => string | null) | null): void
   accessTokenGetter = getter;
 }
 
+export function getAccessToken(): string | null {
+  return accessTokenGetter ? accessTokenGetter() : null;
+}
+
 // Refresh handler registered by AuthContext: performs a token refresh and
 // resolves with the new access token (or null if refresh failed / unavailable).
 type RefreshHandler = () => Promise<string | null>;
