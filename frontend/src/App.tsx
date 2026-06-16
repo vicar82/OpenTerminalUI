@@ -1,6 +1,8 @@
 import { Suspense } from "react";
 import { Navigate, Route, Routes } from "react-router-dom";
 
+import { AgentConsole } from "./agent/components/AgentConsole";
+import { AgentLauncher } from "./agent/components/AgentLauncher";
 import { ErrorBoundary } from "./components/common/ErrorBoundary";
 import { ProtectedRoute } from "./components/ProtectedRoute";
 import { TerminalBackground } from "./components/TerminalBackground";
@@ -106,6 +108,8 @@ function App() {
     <div className="ot-app-shell">
       <ThemeRuntime />
       <TerminalBackground />
+      <AgentConsole />
+      <AgentLauncher />
       <div className="ot-vignette-overlay" />
       <div className="ot-scanline-overlay" />
       <div className="ot-route-layer">
