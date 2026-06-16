@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import json
 import logging
-from typing import Any, AsyncIterator
+from typing import Any, AsyncGenerator
 
 from backend.agent import events
 from backend.agent.tools.registry import ToolRegistry
@@ -37,11 +37,11 @@ class Orchestrator:
 
     async def run(
         self, user_prompt: str, *, screen_context: dict[str, Any] | None = None,
-    ) -> AsyncIterator[dict[str, Any]]:
+    ) -> AsyncGenerator[dict[str, Any], None]:
         messages: list[LLMMessage | AssistantMessage] = [
             LLMMessage(role="system", content=self.system_prompt),
         ]
-        if screen_context:
+        if screen_context is not None:
             messages.append(LLMMessage(
                 role="system",
                 content="Current screen context: " + json.dumps(screen_context),
@@ -55,6 +55,11 @@ class Orchestrator:
             except LLMError as exc:
                 yield events.error(str(exc))
                 yield events.final("The model request failed; please try again.")
+                return
+            except Exception as exc:  # unexpected provider error: don't crash the stream
+                logger.exception("Unexpected provider error")
+                yield events.error(str(exc))
+                yield events.final("The model request failed unexpectedly; please try again.")
                 return
 
             if not assistant.tool_calls:
