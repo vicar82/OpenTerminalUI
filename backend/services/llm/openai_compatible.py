@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import asyncio
 import json
 from typing import Any
 
@@ -55,19 +56,31 @@ class OpenAICompatibleProvider:
             payload["tools"] = [t.to_wire() for t in tools]
             payload["tool_choice"] = "auto"
         url = f"{self.base_url}/chat/completions"
-        try:
-            async with httpx.AsyncClient(
-                timeout=self.timeout, trust_env=False, transport=self._transport
-            ) as client:
-                resp = await client.post(url, json=payload, headers=self._headers())
-                resp.raise_for_status()
-                data = resp.json()
-        except httpx.HTTPStatusError as exc:
-            status = exc.response.status_code if exc.response is not None else "?"
-            raise LLMError(f"LLM HTTP {status}") from exc
-        except (httpx.HTTPError, ValueError) as exc:
-            raise LLMError(f"LLM request failed: {exc}") from exc
-        return self._parse(data)
+        # Free/shared providers (e.g. OpenRouter :free models) return 429 or 5xx
+        # under load; retry a couple of times with backoff before giving up.
+        last_exc: Exception | None = None
+        for attempt in range(3):
+            try:
+                async with httpx.AsyncClient(
+                    timeout=self.timeout, trust_env=False, transport=self._transport
+                ) as client:
+                    resp = await client.post(url, json=payload, headers=self._headers())
+                    resp.raise_for_status()
+                    return self._parse(resp.json())
+            except httpx.HTTPStatusError as exc:
+                status = exc.response.status_code if exc.response is not None else 0
+                last_exc = LLMError(f"LLM HTTP {status}")
+                if status in (429, 500, 502, 503, 504) and attempt < 2:
+                    await asyncio.sleep(1.5 * (attempt + 1))
+                    continue
+                raise last_exc from exc
+            except (httpx.HTTPError, ValueError) as exc:
+                last_exc = LLMError(f"LLM request failed: {exc}")
+                if attempt < 2:
+                    await asyncio.sleep(1.0 * (attempt + 1))
+                    continue
+                raise last_exc from exc
+        raise last_exc or LLMError("LLM request failed")
 
     @staticmethod
     def _parse(data: dict[str, Any]) -> AssistantMessage:

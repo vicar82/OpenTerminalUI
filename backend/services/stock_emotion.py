@@ -1,13 +1,14 @@
-"""Per-stock news emotion analysis backed by a locally hosted Gemma model.
+"""Per-stock news emotion analysis backed by a configurable LLM provider.
 
-Each recent news item for a ticker is scored by the LM Studio model for both
-financial sentiment and the market *emotion* it conveys. The per-article
-results are aggregated into an emotion index (a 0-100 fear<->greed scale), a
-dominant emotion, an emotion distribution and a short narrative.
+Each recent news item for a ticker is scored for both financial sentiment and
+the market *emotion* it conveys by whichever agent LLM provider is configured
+(OpenRouter by default; LM Studio or OpenAI-compatible endpoints are selectable
+via ``agent_provider``). The per-article results are aggregated into an emotion
+index (a 0-100 fear<->greed scale), a dominant emotion, an emotion distribution
+and a short narrative.
 
-When LM Studio is disabled or unreachable the module degrades gracefully to the
-existing lexical sentiment engine so the endpoint always returns a usable
-payload.
+When no provider is reachable the module degrades gracefully to the existing
+lexical sentiment engine so the endpoint always returns a usable payload.
 """
 
 from __future__ import annotations
@@ -19,12 +20,9 @@ from datetime import datetime, timezone
 from typing import Any
 
 from backend.config.settings import get_settings
-from backend.services.lm_studio_client import (
-    LMStudioClient,
-    LMStudioError,
-    get_lm_studio_client,
-    parse_json_response,
-)
+from backend.services.llm.base import LLMError, LLMMessage
+from backend.services.llm.factory import get_llm_provider
+from backend.services.lm_studio_client import parse_json_response
 from backend.services.sentiment_engine import score_article_sentiment
 
 # Emotion taxonomy mapped onto a 0-100 fear<->greed axis.
@@ -216,9 +214,9 @@ def _fallback_analysis(title: str, summary: str) -> dict[str, Any]:
 
 
 async def _analyze_batch(
-    client: LMStudioClient, ticker: str, articles: list[dict[str, Any]]
+    provider: Any, ticker: str, articles: list[dict[str, Any]]
 ) -> list[dict[str, Any]]:
-    """Analyze every article in a single model call; returns the raw analyses."""
+    """Analyze every article in a single LLM call; returns the raw analyses."""
     numbered: list[str] = []
     for idx, article in enumerate(articles, start=1):
         title = str(article.get("title") or "").strip()
@@ -227,21 +225,15 @@ async def _analyze_batch(
             f"{idx}. Headline: {title}\n   Summary: {summary or '(no summary provided)'}"
         )
     messages = [
-        {"role": "system", "content": _SYSTEM_PROMPT},
-        {"role": "user", "content": _build_batch_prompt(ticker, numbered)},
+        LLMMessage(role="system", content=_SYSTEM_PROMPT),
+        LLMMessage(role="user", content=_build_batch_prompt(ticker, numbered)),
     ]
     max_tokens = min(3000, 120 * len(articles) + 256)
-    content = await client.chat(
-        messages,
-        temperature=0.2,
-        max_tokens=max_tokens,
-        json_schema=_batch_schema(len(articles)),
-        frequency_penalty=0.4,
-    )
-    parsed = parse_json_response(content)
+    result = await provider.complete(messages, temperature=0.2, max_tokens=max_tokens)
+    parsed = parse_json_response(result.content or "")
     analyses = parsed.get("analyses")
     if not isinstance(analyses, list):
-        raise LMStudioError("LM Studio batch response missing 'analyses' array")
+        raise LLMError("LLM batch response missing 'analyses' array")
     return analyses
 
 
@@ -348,23 +340,33 @@ async def analyze_stock_emotion(
     """Analyze recent news for a ticker and return an aggregated emotion profile."""
     symbol = ticker.strip().upper()
     settings = get_settings()
-    model = settings.lm_studio_model
+    provider_name = (settings.agent_provider or "openrouter").lower()
 
     selected = [a for a in (articles or []) if str(a.get("title") or "").strip()][:limit]
+
+    # Build the configured agent provider (OpenRouter / OpenAI / LM Studio).
+    provider = None
+    try:
+        provider = get_llm_provider()
+    except Exception:
+        provider = None
+    model = getattr(provider, "model", None) or settings.agent_model
+
     if not selected:
         return _aggregate(symbol, period_days, "fallback", model, [])
 
     engine = "fallback"
     analyzed: list[dict[str, Any]] = []
-    client = get_lm_studio_client()
 
+    # Cloud providers need an API key; LM Studio is keyless/local. Skip the call
+    # (use lexical fallback) when no usable provider is configured.
+    can_try = provider is not None and (bool(getattr(provider, "api_key", None)) or provider_name == "lmstudio")
     raw_analyses: list[Any] = []
-    use_llm = settings.lm_studio_enabled and await client.health()
-    if use_llm:
+    if can_try:
         try:
-            raw_analyses = await _analyze_batch(client, symbol, selected)
-            engine = "lmstudio"
-        except (LMStudioError, asyncio.TimeoutError):
+            raw_analyses = await _analyze_batch(provider, symbol, selected)
+            engine = provider_name
+        except (LLMError, asyncio.TimeoutError):
             raw_analyses = []
             engine = "fallback"
 
@@ -372,7 +374,7 @@ async def analyze_stock_emotion(
         title = str(article.get("title") or "")
         summary = str(article.get("summary") or "")
         raw = raw_analyses[idx] if idx < len(raw_analyses) else None
-        if engine == "lmstudio" and isinstance(raw, dict):
+        if engine != "fallback" and isinstance(raw, dict):
             fallback_score = _coerce_float(
                 (score_article_sentiment(_compose_text(title, summary)) or {}).get("score"), 0.0
             )
@@ -381,7 +383,7 @@ async def analyze_stock_emotion(
             analyzed.append(_fallback_analysis(title, summary))
 
     # If the model returned too few usable entries, mark the run as fallback.
-    if engine == "lmstudio":
+    if engine != "fallback":
         llm_hits = sum(1 for r in analyzed if "Lexical fallback" not in r["rationale"])
         if llm_hits < max(1, len(analyzed) // 2):
             engine = "fallback"

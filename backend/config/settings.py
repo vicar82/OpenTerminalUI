@@ -40,7 +40,8 @@ class AppSettings(BaseModel):
     lm_studio_timeout_seconds: float = 240.0
     # Agent framework (multi-provider LLM)
     agent_provider: str = "openrouter"  # openrouter | openai | lmstudio
-    agent_model: str = "anthropic/claude-opus-4-8"
+    # Default to a free OpenRouter model. Override via AGENT_MODEL / config.
+    agent_model: str = "meta-llama/llama-3.3-70b-instruct:free"
     agent_max_steps: int = 12
     agent_timeout_seconds: float = 120.0
     openrouter_base_url: str = "https://openrouter.ai/api/v1"
@@ -236,7 +237,7 @@ def get_settings() -> AppSettings:
         agent_model=(
             _env("OPENTERMINALUI_AGENT_MODEL")
             or _env("AGENT_MODEL")
-            or app_cfg.get("agent_model", "anthropic/claude-opus-4-8")
+            or app_cfg.get("agent_model", "meta-llama/llama-3.3-70b-instruct:free")
         ),
         agent_max_steps=int(
             _env("OPENTERMINALUI_AGENT_MAX_STEPS")

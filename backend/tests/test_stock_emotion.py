@@ -1,4 +1,4 @@
-"""Tests for the LM Studio backed stock emotion analysis service."""
+"""Tests for the provider-backed stock emotion analysis service."""
 
 from __future__ import annotations
 
@@ -8,11 +8,17 @@ from types import SimpleNamespace
 import pytest
 
 from backend.services import stock_emotion
+from backend.services.llm.base import AssistantMessage
 from backend.services.lm_studio_client import LMStudioError, parse_json_response
 
 
-def _fake_settings(enabled: bool = False) -> SimpleNamespace:
-    return SimpleNamespace(lm_studio_enabled=enabled, lm_studio_model="google/gemma-4-26b-a4b")
+def _fake_settings(provider: str = "openrouter") -> SimpleNamespace:
+    return SimpleNamespace(
+        agent_provider=provider,
+        agent_model="test-model",
+        lm_studio_model="google/gemma-4-26b-a4b",
+        lm_studio_enabled=False,
+    )
 
 
 def _stub_sentiment(text: str) -> dict:
@@ -24,19 +30,20 @@ def _stub_sentiment(text: str) -> dict:
     return {"score": 0.0, "label": "Neutral", "confidence": 0.3}
 
 
-class _FakeClient:
-    model = "google/gemma-4-26b-a4b"
+class _FakeProvider:
+    """Stand-in for an OpenAI-compatible provider (OpenRouter/LM Studio/etc.)."""
 
-    async def health(self) -> bool:
-        return True
+    def __init__(self, api_key: str | None = "k", model: str = "test-model") -> None:
+        self.api_key = api_key
+        self.model = model
 
-    async def chat(self, messages, **kwargs) -> str:  # noqa: ANN001
-        if kwargs.get("json_schema") is None:
-            return "Market mood toward the stock is constructive."
-        return (
-            '{"analyses": [{"sentiment_score": 0.5, "sentiment_label": "Bullish", '
-            '"confidence": 0.8, "emotion": "optimism", '
-            '"emotion_intensity": 0.7, "rationale": "Strong quarterly results."}]}'
+    async def complete(self, messages, tools=None, *, temperature=0.1, max_tokens=1024) -> AssistantMessage:  # noqa: ANN001
+        return AssistantMessage(
+            content=(
+                '{"analyses": [{"sentiment_score": 0.5, "sentiment_label": "Bullish", '
+                '"confidence": 0.8, "emotion": "optimism", '
+                '"emotion_intensity": 0.7, "rationale": "Strong quarterly results."}]}'
+            )
         )
 
 
@@ -59,7 +66,9 @@ def test_parse_json_response_raises_on_garbage() -> None:
 
 
 def test_analyze_stock_emotion_fallback(monkeypatch) -> None:
-    monkeypatch.setattr(stock_emotion, "get_settings", lambda: _fake_settings(enabled=False))
+    monkeypatch.setattr(stock_emotion, "get_settings", lambda: _fake_settings())
+    # Provider has no API key -> cloud call is skipped -> lexical fallback.
+    monkeypatch.setattr(stock_emotion, "get_llm_provider", lambda: _FakeProvider(api_key=None))
     monkeypatch.setattr(stock_emotion, "score_article_sentiment", _stub_sentiment)
     articles = [
         {"title": "Company beats earnings and posts record profit", "summary": "strong growth",
@@ -77,23 +86,24 @@ def test_analyze_stock_emotion_fallback(monkeypatch) -> None:
 
 
 def test_analyze_stock_emotion_empty(monkeypatch) -> None:
-    monkeypatch.setattr(stock_emotion, "get_settings", lambda: _fake_settings(enabled=False))
+    monkeypatch.setattr(stock_emotion, "get_settings", lambda: _fake_settings())
+    monkeypatch.setattr(stock_emotion, "get_llm_provider", lambda: _FakeProvider(api_key=None))
     result = asyncio.run(stock_emotion.analyze_stock_emotion("TEST", [], period_days=7))
     assert result["articles_analyzed"] == 0
     assert result["emotion_index"] == 50.0
     assert result["emotion_index_label"] == "Neutral"
 
 
-def test_analyze_stock_emotion_lmstudio(monkeypatch) -> None:
-    monkeypatch.setattr(stock_emotion, "get_settings", lambda: _fake_settings(enabled=True))
-    monkeypatch.setattr(stock_emotion, "get_lm_studio_client", _FakeClient)
+def test_analyze_stock_emotion_via_provider(monkeypatch) -> None:
+    monkeypatch.setattr(stock_emotion, "get_settings", lambda: _fake_settings(provider="openrouter"))
+    monkeypatch.setattr(stock_emotion, "get_llm_provider", lambda: _FakeProvider(api_key="k"))
     monkeypatch.setattr(stock_emotion, "score_article_sentiment", _stub_sentiment)
     articles = [
         {"title": "Upbeat outlook lifts shares", "summary": "", "source": "Wire",
          "url": "u1", "published_at": "2026-05-12"},
     ]
     result = asyncio.run(stock_emotion.analyze_stock_emotion("TEST", articles, period_days=7))
-    assert result["engine"] == "lmstudio"
+    assert result["engine"] == "openrouter"
     assert result["dominant_emotion"] == "optimism"
     assert result["sentiment_label"] == "Bullish"
     assert result["narrative"].startswith("TEST")
