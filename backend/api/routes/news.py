@@ -297,7 +297,7 @@ async def get_symbol_news(
     market: str = Query(..., description="NSE|BSE|NYSE|NASDAQ"),
     symbol: str = Query(..., min_length=1, max_length=24),
     limit: int = Query(default=30, ge=1, le=100),
-) -> dict[str, list[dict[str, str]]]:
+) -> dict[str, Any]:
     market_code = _validate_market(market)
     ticker = symbol.strip().upper()
 
@@ -316,7 +316,7 @@ async def get_symbol_news(
 async def get_market_news(
     market: str = Query(..., description="NSE|BSE|NYSE|NASDAQ"),
     limit: int = Query(default=30, ge=1, le=100),
-) -> dict[str, list[dict[str, str]]]:
+) -> dict[str, Any]:
     market_code = _validate_market(market)
 
     if market_code in IN_MARKETS:

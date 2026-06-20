@@ -282,25 +282,35 @@ async def compare_charts(
     import asyncio
     tasks = []
     for sym in sym_list:
-        tasks.append(fetcher.fetch_history(sym, range_val=period, interval=interval))
+        tasks.append(fetcher.fetch_history(sym, range_str=period, interval=interval))
 
     results = await asyncio.gather(*tasks, return_exceptions=True)
 
     # Process into dataframes and align
     dfs = {}
     for sym, res in zip(sym_list, results):
-        if isinstance(res, Exception):
+        if isinstance(res, Exception) or not isinstance(res, dict):
             continue
-        # Expecting ChartResponse dict
-        if isinstance(res, dict) and "data" in res:
-            rows = res["data"]
-            if not rows:
-                continue
-            df = pd.DataFrame([{"date": pd.to_datetime(r["date"] if isinstance(r, dict) else getattr(r, "date")), "close": r["close"] if isinstance(r, dict) else getattr(r, "close")} for r in rows])
-            if not df.empty:
-                df.set_index("date", inplace=True)
-                # Keep only close price
-                dfs[sym] = df["close"]
+        # fetch_history returns Yahoo-style chart JSON:
+        # {"chart": {"result": [{"timestamp": [...], "indicators": {"quote": [{"close": [...]}]}}]}}
+        result = (((res.get("chart") or {}).get("result")) or [None])[0]
+        if not isinstance(result, dict):
+            continue
+        timestamps = result.get("timestamp") or []
+        quote = (((result.get("indicators") or {}).get("quote")) or [{}])[0]
+        closes = quote.get("close") or []
+        if not timestamps or not closes:
+            continue
+        n = min(len(timestamps), len(closes))
+        df = pd.DataFrame(
+            {
+                "date": pd.to_datetime(timestamps[:n], unit="s"),
+                "close": pd.to_numeric(closes[:n], errors="coerce"),
+            }
+        ).dropna()
+        if not df.empty:
+            df.set_index("date", inplace=True)
+            dfs[sym] = df["close"]
 
     if not dfs:
         return {"dates": [], "series": {}}

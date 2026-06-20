@@ -10,6 +10,12 @@ import httpx
 
 logger = logging.getLogger(__name__)
 
+
+class NSEBlockedError(RuntimeError):
+    """Raised when NSE is hard-blocking requests (HTTP 403/401) and the
+    circuit breaker is open. Callers should fall back to another provider."""
+
+
 DEFAULT_USER_AGENTS = [
     "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
     "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
@@ -72,6 +78,13 @@ class NSEClient:
     BASE_URL = "https://www.nseindia.com"
     API_BASE_URL = "https://www.nseindia.com/api"
 
+    # Circuit breaker: NSE hard-blocks datacenter IPs with HTTP 403. Once we
+    # see repeated blocks, stop hammering it (and re-initializing sessions) for
+    # a cooldown so callers fall back to other providers immediately instead of
+    # paying ~tens of seconds of retries + backoff per request.
+    _CB_THRESHOLD = 3
+    _CB_COOLDOWN = 300.0  # seconds
+
     def __init__(self, sessions_count: int = 3, rate_limit_per_sec: int = 3):
         self.sessions_count = sessions_count
         self.rate_limit_delay = 1.0 / rate_limit_per_sec
@@ -79,6 +92,26 @@ class NSEClient:
         self._session_idx = 0
         self._lock = asyncio.Lock()
         self._last_request_time = 0.0
+        self._cb_fail_count = 0
+        self._cb_open_until = 0.0
+
+    def _circuit_open(self) -> bool:
+        return time.time() < self._cb_open_until
+
+    def _note_block(self) -> None:
+        self._cb_fail_count += 1
+        if self._cb_fail_count >= self._CB_THRESHOLD:
+            self._cb_open_until = time.time() + self._CB_COOLDOWN
+            logger.warning(
+                "NSE circuit breaker OPEN for %.0fs after %d consecutive blocks; "
+                "failing fast and deferring to fallback providers.",
+                self._CB_COOLDOWN,
+                self._cb_fail_count,
+            )
+
+    def _note_success(self) -> None:
+        self._cb_fail_count = 0
+        self._cb_open_until = 0.0
 
     async def _get_session(self) -> NSESession:
         async with self._lock:
@@ -104,6 +137,12 @@ class NSEClient:
             return session
 
     async def _request(self, endpoint: str, params: dict = None, attempt: int = 1) -> Any:
+        # Fail fast while the breaker is open so callers fall back immediately.
+        if self._circuit_open():
+            raise NSEBlockedError(
+                f"NSE circuit breaker open; skipping {endpoint}"
+            )
+
         session = await self._get_session()
 
         try:
@@ -115,15 +154,18 @@ class NSEClient:
             response = await session.client.get(url, params=params)
 
             if response.status_code == 401 or response.status_code == 403:
-                # Cookie expiry or blocking
+                # Cookie expiry or hard block. Refresh once cheaply, then give up
+                # fast — repeated re-init + exponential backoff was costing tens
+                # of seconds per request when NSE blocks the IP outright.
                 logger.warning(f"NSE {response.status_code} for {endpoint}. Refreshing session.")
-                await session.initialize() # Re-init clears cookies
-                if attempt < 3:
-                     # Exponential backoff
-                    await asyncio.sleep(2 ** attempt + random.random())
+                self._note_block()
+                if attempt < 2 and not self._circuit_open():
+                    await session.initialize()  # Re-init clears cookies
+                    await asyncio.sleep(0.5 + random.random() * 0.5)
                     return await self._request(endpoint, params, attempt + 1)
-                else:
-                    response.raise_for_status()
+                raise NSEBlockedError(
+                    f"NSE {response.status_code} for {endpoint}"
+                )
 
             if response.status_code == 429:
                 # Rate limit
@@ -135,7 +177,9 @@ class NSEClient:
                     response.raise_for_status()
 
             response.raise_for_status()
-            return response.json()
+            data = response.json()
+            self._note_success()
+            return data
 
         except (httpx.RequestError, httpx.HTTPStatusError, ValueError) as e:
             # ValueError covers malformed/undecodable JSON payloads from upstream.
