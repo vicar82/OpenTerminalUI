@@ -28,6 +28,14 @@ def error(message: str) -> dict[str, Any]:
     return {"type": "error", "message": message}
 
 
+def phase(key: str, label: str) -> dict[str, Any]:
+    return {"type": "phase", "key": key, "label": label}
+
+
+def role_message(role: str, content: str) -> dict[str, Any]:
+    return {"type": "role_message", "role": role, "content": content}
+
+
 # Map tool name -> artifact kind for the frontend canvas.
 ARTIFACT_KINDS = {
     "screen_stocks": "screener_table",

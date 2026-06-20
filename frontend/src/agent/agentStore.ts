@@ -10,10 +10,12 @@ const nextId = () => `m${Date.now()}_${seq++}`;
 interface AgentState {
   open: boolean;
   running: boolean;
+  debate: boolean;
   messages: AgentMessage[];
   artifacts: AgentArtifact[];
   toggleOpen: () => void;
   setOpen: (open: boolean) => void;
+  toggleDebate: () => void;
   appendUserAndPending: (prompt: string) => void;
   applyEvent: (event: AgentEvent) => void;
   startRun: (prompt: string) => Promise<void>;
@@ -22,18 +24,20 @@ interface AgentState {
 export const useAgentStore = create<AgentState>((set, get) => ({
   open: false,
   running: false,
+  debate: false,
   messages: [],
   artifacts: [],
 
   toggleOpen: () => set((s) => ({ open: !s.open })),
   setOpen: (open) => set({ open }),
+  toggleDebate: () => set((s) => ({ debate: !s.debate })),
 
   appendUserAndPending: (prompt) =>
     set((s) => ({
       messages: [
         ...s.messages,
-        { id: nextId(), role: "user", content: prompt, steps: [], pending: false },
-        { id: nextId(), role: "assistant", content: "", steps: [], pending: true },
+        { id: nextId(), role: "user", content: prompt, steps: [], phases: [], roles: [], pending: false },
+        { id: nextId(), role: "assistant", content: "", steps: [], phases: [], roles: [], pending: true },
       ],
     })),
 
@@ -51,7 +55,12 @@ export const useAgentStore = create<AgentState>((set, get) => ({
       const messages = s.messages.slice();
       const idx = messages.length - 1;
       if (idx < 0 || messages[idx].role !== "assistant") return s;
-      const msg = { ...messages[idx], steps: messages[idx].steps.slice() };
+      const msg = {
+        ...messages[idx],
+        steps: messages[idx].steps.slice(),
+        phases: messages[idx].phases.slice(),
+        roles: messages[idx].roles.slice(),
+      };
 
       switch (event.type) {
         case "tool_call":
@@ -63,6 +72,12 @@ export const useAgentStore = create<AgentState>((set, get) => ({
           if (si !== -1) msg.steps[si] = { ...msg.steps[si], isError: event.is_error };
           break;
         }
+        case "phase":
+          msg.phases.push({ key: event.key, label: event.label });
+          break;
+        case "role_message":
+          msg.roles.push({ role: event.role, content: event.content });
+          break;
         case "token":
           msg.content += event.text;
           break;
@@ -87,7 +102,12 @@ export const useAgentStore = create<AgentState>((set, get) => ({
     get().appendUserAndPending(text);
     set({ running: true });
     try {
-      const runId = await createRun({ prompt: text, context: buildScreenContext() });
+      const debate = get().debate;
+      const runId = await createRun({
+        prompt: text,
+        context: buildScreenContext(),
+        ...(debate ? { mode: "debate" as const, ticker: text } : {}),
+      });
       await streamRun(runId, (event) => get().applyEvent(event));
     } catch (err) {
       get().applyEvent({ type: "error", message: (err as Error).message || "request failed" });

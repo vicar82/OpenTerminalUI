@@ -8,6 +8,7 @@ from fastapi import APIRouter, Depends, HTTPException
 from fastapi.responses import StreamingResponse
 
 from backend.agent.orchestrator import Orchestrator
+from backend.agent.debate import DebateOrchestrator
 from backend.agent.tools.market_tools import build_default_registry
 from backend.auth.deps import get_current_user
 from backend.config.settings import get_settings
@@ -28,6 +29,8 @@ async def create_run(payload: Dict[str, Any], user=Depends(get_current_user)) ->
     run_id = uuid.uuid4().hex
     _PENDING[run_id] = {
         "prompt": prompt,
+        "mode": payload.get("mode") or "standard",
+        "ticker": payload.get("ticker"),
         "context": payload.get("context") or {},
         "provider": payload.get("provider"),
         "model": payload.get("model"),
@@ -49,12 +52,23 @@ async def stream_run(run_id: str, user=Depends(get_current_user)) -> StreamingRe
     settings = get_settings()
     provider = get_llm_provider(provider=spec["provider"], model=spec["model"])
     registry = build_default_registry()
-    orchestrator = Orchestrator(
-        provider=provider, registry=registry, max_steps=settings.agent_max_steps)
+    if spec["mode"] == "debate":
+        if not settings.agent_debate_enabled:
+            raise HTTPException(status_code=403, detail="debate mode disabled")
+        subject = (spec.get("ticker") or spec["prompt"]).strip()
+        orchestrator = DebateOrchestrator(
+            provider=provider,
+            registry=registry,
+            analyst_max_steps=settings.agent_debate_analyst_max_steps,
+        )
+        run_args = (subject,)
+    else:
+        orchestrator = Orchestrator(
+            provider=provider, registry=registry, max_steps=settings.agent_max_steps)
+        run_args = (spec["prompt"],)
 
     async def event_stream():
-        async for event in orchestrator.run(
-            spec["prompt"], screen_context=spec["context"]):
+        async for event in orchestrator.run(*run_args, screen_context=spec["context"]):
             yield f"data: {json.dumps(event, default=str)}\n\n"
 
     return StreamingResponse(event_stream(), media_type="text/event-stream")

@@ -8,10 +8,12 @@ import { ChatThread } from "./ChatThread";
 export function AgentConsole() {
   const open = useAgentStore((s) => s.open);
   const running = useAgentStore((s) => s.running);
+  const debate = useAgentStore((s) => s.debate);
   const messages = useAgentStore((s) => s.messages);
   const artifacts = useAgentStore((s) => s.artifacts);
   const toggleOpen = useAgentStore((s) => s.toggleOpen);
   const setOpen = useAgentStore((s) => s.setOpen);
+  const toggleDebate = useAgentStore((s) => s.toggleDebate);
   const startRun = useAgentStore((s) => s.startRun);
   const [draft, setDraft] = useState("");
 
@@ -50,7 +52,23 @@ export function AgentConsole() {
           fontWeight: "var(--ot-font-weight-semibold)", color: "var(--ot-color-text-primary)",
         }}
       >
-        <span>Agent</span>
+        <div style={{ display: "flex", alignItems: "center", gap: "var(--ot-space-2)" }}>
+          <span>Agent</span>
+          <button
+            type="button"
+            onClick={toggleDebate}
+            aria-pressed={debate}
+            aria-label="Toggle multi-agent debate mode"
+            title="Multi-agent debate: analyst team → bull vs bear → portfolio-manager decision"
+            className={`rounded border px-2 py-0.5 font-mono text-[10px] font-semibold uppercase tracking-wide transition-colors ${
+              debate
+                ? "border-terminal-accent bg-terminal-accent text-terminal-bg"
+                : "border-terminal-border text-terminal-muted hover:border-terminal-accent hover:text-terminal-accent"
+            }`}
+          >
+            Debate
+          </button>
+        </div>
         <button
           type="button"
           onClick={() => setOpen(false)}
@@ -71,7 +89,7 @@ export function AgentConsole() {
           value={draft}
           onChange={(e) => setDraft(e.target.value)}
           onKeyDown={(e) => { if (e.key === "Enter") submit(); }}
-          placeholder="Ask the agent to find or analyze stocks…"
+          placeholder={debate ? "Enter a ticker for multi-agent debate…" : "Ask the agent to find or analyze stocks…"}
           aria-label="Agent prompt"
           style={{
             flex: 1, background: "var(--ot-color-canvas-elevated)",
