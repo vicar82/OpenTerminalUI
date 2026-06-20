@@ -33,7 +33,7 @@
 
 OpenTerminalUI is a self-hosted, full-stack financial terminal that combines real-time market data, institutional-grade charting, derivatives analytics, portfolio management, and quant research into a single platform. Built with a terminal-style shell interface inspired by Bloomberg and Refinitiv, it delivers professional-grade workflows to anyone with a browser.
 
-**Multi-market coverage** across NSE, BSE, NYSE, NASDAQ, crypto, commodities, forex, bonds, ETFs, and mutual funds. **70+ technical indicators**, **multi-panel chart workstations**, **F&O option chains with live Greeks**, **backtesting with Model Lab**, **statistical arbitrage with Pair Trading Lab**, **portfolio analytics with risk engine**, and an **extensible plugin system** &mdash; all running on your own hardware.
+**Multi-market coverage** across NSE, BSE, NYSE, NASDAQ, crypto, commodities, forex, bonds, ETFs, and mutual funds. **70+ technical indicators**, **multi-panel chart workstations**, **F&O option chains with live Greeks**, **backtesting with Model Lab**, **statistical arbitrage with Pair Trading Lab**, **portfolio analytics with risk engine**, a **tool-using AI research agent with multi-agent debate**, and an **extensible plugin system** &mdash; all running on your own hardware.
 
 ## Screenshots
 
@@ -186,6 +186,16 @@ OpenTerminalUI is a self-hosted, full-stack financial terminal that combines rea
 - **Catalyst & Conviction Engine** &mdash; LLM-extracted sentiment and upcoming catalysts from NSE/BSE and SEC filings, surfaced in the Security Hub
 - **Point-in-Time Fundamentals** &mdash; as-reported fundamental history that removes look-ahead bias from factor and fundamental backtests
 - **Why-Ranked Explanations** &mdash; composite scores, factor chips, and plain-language rationale on screener rows, with one-click routing to chart and backtest
+
+### AI Research Agent
+
+- **Conversational Console** &mdash; a slide-over agent panel (toggle with **Ctrl/Cmd + J**) that researches and analyzes stocks on demand
+- **Tool-Using Agentic Loop** &mdash; the agent autonomously calls read-only tools &mdash; screener, full stock snapshot, multi-ticker compare, and research-knowledge-base search (RAG) &mdash; and reasons over the results
+- **Screen-Aware Context** &mdash; defaults to the stock you currently have open and your selected market, so "tell me about this stock" resolves to the right ticker/exchange without re-typing it
+- **Multi-Agent Debate Mode** &mdash; an analyst team (fundamental / sentiment / technical) feeds a bull-vs-bear debate that a portfolio manager resolves into a `BUY / HOLD / SELL` decision with a conviction score
+- **Beautifully Rendered Output** &mdash; answers render as styled markdown (headings, tables, lists), stock snapshots as crafted cards (logo, price, valuation/quality/growth metrics), and debates as a phase stepper with bull/bear cards and a decision banner with conviction meter
+- **Provider-Flexible** &mdash; runs against OpenRouter, OpenAI, or a local **LM Studio** model, with an automatic free-model fallback chain
+- **Read-Only & Resilient** &mdash; the agent never places orders or mutates data, and degrades gracefully on rate limits, empty completions, or unavailable data sources
 
 ### Futures & Options (F&O)
 
@@ -480,6 +490,11 @@ The platform runs without API keys using fallback providers. Add keys to unlock 
 | `LM_STUDIO_BASE_URL` | LM Studio OpenAI-compatible endpoint (default `http://localhost:1234/v1`; use `http://host.docker.internal:1234/v1` from Docker) |
 | `LM_STUDIO_MODEL` | Gemma model id loaded in LM Studio (default `google/gemma-4-26b-a4b`) |
 | `LM_STUDIO_ENABLED` | Toggle the LLM emotion analysis (default `true`; falls back to lexical sentiment when off) |
+| `OPENROUTER_API_KEY` | OpenRouter key powering the AI research agent (free `:free` models work) |
+| `AGENT_PROVIDER` | Agent LLM provider: `openrouter` \| `openai` \| `lmstudio` (default `openrouter`) |
+| `AGENT_MODEL` | Primary agent model id (default `openai/gpt-oss-20b:free`) |
+| `AGENT_FALLBACK_MODELS` | Comma-separated models tried when the primary is rate-limited (429) or unavailable (404) |
+| `AGENT_DEBATE_ENABLED` | Enable multi-agent debate mode in the agent console (default `true`) |
 
 ## AI News Sentiment with Gemma 4 (LM Studio)
 
@@ -594,6 +609,7 @@ make gate
 ```
 backend/                 FastAPI app, adapters, services, routes, tests
   adapters/              Market data provider adapters
+  agent/                 AI research agent: orchestrator, tools, debate roles
   api/routes/            53 route modules (equity, fno, backtest, risk, oms, ...)
   core/                  Unified fetcher, failover, service status
   services/              48 business logic modules
@@ -602,6 +618,7 @@ backend/                 FastAPI app, adapters, services, routes, tests
   config/                Settings, environment, security
   tests/                 409+ backend tests
 frontend/                React + Vite + TypeScript SPA
+  src/agent/             AI agent console, SSE client, artifact + markdown UI
   src/pages/             51 page components
   src/components/        UI components, terminal design system
   src/fno/               F&O workspace modules
@@ -624,6 +641,7 @@ Makefile                 Development commands (setup, test, gate)
 |----------|--------|
 | `Ctrl+G` | GO Bar &mdash; symbol lookup and navigation |
 | `Ctrl+K` | Command Palette &mdash; fuzzy search across all features |
+| `Ctrl+J` | AI Research Agent &mdash; toggle the agent console |
 | `F1`-`F9` | Function keys for workspace switching |
 | `1`-`7` | Timeframe hotkeys in chart views |
 | `Esc` | Close active panel or dialog |
