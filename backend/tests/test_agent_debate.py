@@ -88,3 +88,32 @@ async def test_debate_emits_final_when_portfolio_manager_fails():
     assert result[-1]["type"] == "final"
     assert "DECISION:" in result[-1]["content"]
     assert any(event["type"] == "error" for event in result)
+
+
+class EmptyContentProvider:
+    """Analysts answer; bull/bear/PM return empty content (no exception).
+
+    Reproduces a flaky small/free model that intermittently yields empty
+    completions on long prompts.
+    """
+
+    async def complete(self, messages, tools=None, *, temperature=0.1, max_tokens=1024):
+        system = messages[0].content
+        if system in (roles.FUNDAMENTAL_ANALYST, roles.SENTIMENT_ANALYST, roles.TECHNICAL_ANALYST):
+            return AssistantMessage(content="Analyst verdict.")
+        return AssistantMessage(content="")  # bull, bear, portfolio manager
+
+
+@pytest.mark.asyncio
+async def test_debate_handles_empty_model_content_with_valid_decision():
+    stream = DebateOrchestrator(provider=EmptyContentProvider(), registry=_registry())
+    result = [event async for event in stream.run("RELIANCE")]
+
+    finals = [e for e in result if e["type"] == "final"]
+    assert len(finals) == 1
+    # The final must still carry a usable DECISION line despite empty PM content.
+    assert "DECISION:" in finals[0]["content"]
+    # Bull/bear role messages must not be blank.
+    role_msgs = {e["role"]: e["content"] for e in result if e["type"] == "role_message"}
+    assert role_msgs["bull"].strip()
+    assert role_msgs["bear"].strip()

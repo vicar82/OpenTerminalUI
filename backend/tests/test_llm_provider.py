@@ -75,6 +75,32 @@ async def test_complete_parses_plain_content():
 
 
 @pytest.mark.asyncio
+async def test_complete_falls_back_to_reasoning_when_content_empty():
+    # Reasoning models (e.g. gpt-oss) may return null content + a reasoning field.
+    resp = {"choices": [{"message": {"content": None, "reasoning": "DECISION: HOLD | CONVICTION: 50 | balanced."}}]}
+    provider = OpenAICompatibleProvider(
+        base_url="https://x/api/v1", api_key=None, model="m",
+        transport=_mock_transport({}, resp),
+    )
+    out = await provider.complete([LLMMessage(role="user", content="decide")])
+    assert "DECISION:" in (out.content or "")
+
+
+@pytest.mark.asyncio
+async def test_reasoning_not_used_when_tool_call_present():
+    # A tool-calling turn legitimately has null content; reasoning must NOT override it.
+    resp = {"choices": [{"message": {"content": None, "reasoning": "thinking...", "tool_calls": [
+        {"id": "c1", "type": "function", "function": {"name": "get_quote", "arguments": "{}"}}]}}]}
+    provider = OpenAICompatibleProvider(
+        base_url="https://x/api/v1", api_key=None, model="m",
+        transport=_mock_transport({}, resp),
+    )
+    out = await provider.complete([LLMMessage(role="user", content="quote")])
+    assert out.tool_calls[0].name == "get_quote"
+    assert (out.content or "") == ""  # reasoning ignored on tool turns
+
+
+@pytest.mark.asyncio
 async def test_http_error_raises_llmerror():
     from backend.services.llm.base import LLMError
 

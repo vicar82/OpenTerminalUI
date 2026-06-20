@@ -43,19 +43,36 @@ class DebateOrchestrator:
             note = f"{role_key} analysis was unavailable."
         return passthrough, note
 
+    # Per-note cap kept modest so the combined bull/bear/PM context stays well
+    # within small (free-tier) model context windows — large prompts caused some
+    # models to return empty completions.
+    _NOTE_CAP = 2500
+
     @staticmethod
     def _analyst_context(notes: dict[str, str]) -> str:
         return "\n\n".join(
-            f"{role.upper()} ANALYST NOTE:\n{notes.get(role, '')[:6000]}"
+            f"{role.upper()} ANALYST NOTE:\n{notes.get(role, '')[:DebateOrchestrator._NOTE_CAP]}"
             for role, _ in roles.ANALYSTS
         )
 
     async def _complete(self, system: str, user: str) -> str:
-        response = await self.provider.complete(
-            [LLMMessage(role="system", content=system), LLMMessage(role="user", content=user)],
-            tools=None,
-        )
-        return response.content or ""
+        """One LLM turn that tolerates empty completions.
+
+        Some models intermittently return empty content on long prompts; retry
+        once with a shorter prompt before giving up. Returns '' if still empty.
+        """
+        for user_text in (user, user[:4000]):
+            response = await self.provider.complete(
+                [LLMMessage(role="system", content=system), LLMMessage(role="user", content=user_text)],
+                tools=None,
+                # Headroom for reasoning models (e.g. gpt-oss): a tight token cap
+                # gets consumed by reasoning and yields empty content on long prompts.
+                max_tokens=1536,
+            )
+            content = (response.content or "").strip()
+            if content:
+                return content
+        return ""
 
     async def run(
         self, subject: str, *, screen_context: dict[str, Any] | None = None,
@@ -80,13 +97,15 @@ class DebateOrchestrator:
                 bull = await self._complete(roles.BULL_RESEARCHER, analyst_context)
             except Exception as exc:
                 yield events.error(str(exc))
-                bull = "Bull case unavailable."
+                bull = ""
+            bull = bull or "Bull case unavailable (model returned no content)."
             yield events.role_message("bull", bull)
             try:
                 bear = await self._complete(roles.BEAR_RESEARCHER, analyst_context)
             except Exception as exc:
                 yield events.error(str(exc))
-                bear = "Bear case unavailable."
+                bear = ""
+            bear = bear or "Bear case unavailable (model returned no content)."
             yield events.role_message("bear", bear)
 
             yield events.phase("decision", "Portfolio manager")
@@ -95,7 +114,13 @@ class DebateOrchestrator:
                 decision = await self._complete(roles.PORTFOLIO_MANAGER, decision_context)
             except Exception as exc:
                 yield events.error(str(exc))
-                decision = "Unable to complete the portfolio review.\nDECISION: HOLD | CONVICTION: 0 | The portfolio-manager model request failed."
+                decision = ""
+            # Guarantee the final always carries a usable DECISION line, even if
+            # the model returned empty content or omitted the required format.
+            if "DECISION:" not in decision:
+                decision = (
+                    f"{decision}\n\n" if decision.strip() else ""
+                ) + "DECISION: HOLD | CONVICTION: 0 | Portfolio manager returned no decision; defaulting to HOLD."
             yield events.final(decision)
         except Exception as exc:  # final defensive boundary for all coordinator failures
             yield events.error(str(exc))

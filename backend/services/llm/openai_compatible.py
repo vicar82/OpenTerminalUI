@@ -106,4 +106,10 @@ class OpenAICompatibleProvider:
             except json.JSONDecodeError:
                 args = {}
             calls.append(ToolCall(id=rc.get("id", ""), name=fn.get("name", ""), arguments=args))
-        return AssistantMessage(content=message.get("content"), tool_calls=calls)
+        content = message.get("content")
+        # Reasoning models (e.g. gpt-oss) sometimes return their text in a
+        # `reasoning` field with `content` null (notably when finish_reason=length).
+        # Fall back to it so non-tool turns don't surface as empty responses.
+        if not (content or "").strip() and not calls:
+            content = message.get("reasoning") or content
+        return AssistantMessage(content=content, tool_calls=calls)
