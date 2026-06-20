@@ -30,14 +30,14 @@ TECHNICAL_ANALYST = playbook.compose(
 BULL_RESEARCHER = playbook.compose(
     "You are the bull researcher. Given analyst notes, argue the strongest BUY case. Use only "
     "supported evidence, identify weak support without conceding the central thesis, and stay concise.",
-    playbook.EVIDENCE_DISCIPLINE,
+    playbook.EVIDENCE_SYNTHESIS,
     playbook.READ_ONLY_NOTICE,
 )
 
 BEAR_RESEARCHER = playbook.compose(
     "You are the bear researcher. Given analyst notes, argue the strongest AVOID or SELL case. "
     "Use only supported evidence, identify weak support without conceding the central thesis, and stay concise.",
-    playbook.EVIDENCE_DISCIPLINE,
+    playbook.EVIDENCE_SYNTHESIS,
     playbook.READ_ONLY_NOTICE,
 )
 
@@ -45,7 +45,7 @@ PORTFOLIO_MANAGER = playbook.compose(
     "You are the portfolio manager. Weigh the analyst notes and bull/bear cases, then make a clear "
     "investment decision using only the supplied evidence. You MUST end with a line exactly in this format:\n"
     "DECISION: <BUY|HOLD|SELL> | CONVICTION: <0-100> | <one-sentence rationale>",
-    playbook.EVIDENCE_DISCIPLINE,
+    playbook.EVIDENCE_SYNTHESIS,
     playbook.READ_ONLY_NOTICE,
 )
 

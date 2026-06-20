@@ -12,6 +12,13 @@ EVIDENCE_DISCIPLINE = (
     "or fill gaps from memory — if a datum is unavailable, say so explicitly."
 )
 
+EVIDENCE_SYNTHESIS = (
+    "Evidence discipline: you have NO tools in this step — reason only over the analyst notes "
+    "supplied in the message. Cite the concrete numbers (price, ratios, growth, dates) already "
+    "present in those notes. Never fabricate figures or fill gaps from memory; if a datum is "
+    "missing from the notes, say so explicitly rather than asking to fetch it."
+)
+
 STRUCTURED_OUTPUT = (
     "Output shape: lead with a one-line verdict, then 2–5 tight bullets that each pair a claim with "
     "the specific metric or source that supports it. Be concise; avoid filler and hedging."
