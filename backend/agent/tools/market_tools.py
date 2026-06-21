@@ -498,6 +498,60 @@ async def scan_setups(args: dict[str, Any]) -> dict[str, Any]:
         return {"universe": universe, "timeframe": timeframe, "scanned": 0, "matches": 0, "results": [], "note": f"Setup scan could not be summarized: {exc}"}
 
 
+def _strategy_specs() -> list[ToolSpec]:
+    """The complete, shared definition of the strategy loop's read-only tools."""
+    return [
+        ToolSpec(
+            name="backtest_symbol",
+            description="Backtest a simple SMA crossover strategy for one ticker using daily price history.",
+            parameters={
+                "type": "object", "properties": {
+                    "ticker": {"type": "string"},
+                    "strategy": {"type": "string", "enum": ["sma_crossover"], "default": "sma_crossover"},
+                    "short_window": {"type": "integer", "minimum": 1, "default": 20},
+                    "long_window": {"type": "integer", "minimum": 2, "default": 50},
+                    "range": {"type": "string", "default": "3y"},
+                }, "required": ["ticker"],
+            }, handler=backtest_symbol, read_only=True, write_class="none",
+        ),
+        ToolSpec(
+            name="backtest_basket",
+            description="Backtest momentum rotation over a basket of 2 to 30 tickers.",
+            parameters={
+                "type": "object", "properties": {
+                    "tickers": {"type": "array", "minItems": 2, "maxItems": 30, "items": {"type": "string"}},
+                    "top_n": {"type": "integer", "minimum": 1, "default": 5},
+                    "lookback_days": {"type": "integer", "minimum": 1, "default": 63},
+                    "rebalance_freq": {"type": "string", "default": "ME"},
+                    "benchmark": {"type": "string"}, "market": {"type": "string", "enum": ["IN", "US"]},
+                    "years": {"type": "integer", "minimum": 1, "default": 3},
+                }, "required": ["tickers"],
+            }, handler=backtest_basket, read_only=True, write_class="none",
+        ),
+        ToolSpec(
+            name="validate_backtest",
+            description="Run permutation and multi-window robustness checks on a backtest equity curve.",
+            parameters={
+                "type": "object", "properties": {
+                    "equity_curve": {"type": "array", "items": {"type": "object"}},
+                    "metric": {"type": "string", "enum": ["sharpe", "total_return"], "default": "sharpe"},
+                    "n_permutations": {"type": "integer", "minimum": 100, "maximum": 2000, "default": 500},
+                    "n_windows": {"type": "integer", "minimum": 2, "maximum": 12, "default": 5},
+                    "periods_per_year": {"type": "integer", "default": 252},
+                }, "required": ["equity_curve"],
+            }, handler=validate_backtest, read_only=True, write_class="none",
+        ),
+    ]
+
+
+def build_strategy_registry() -> ToolRegistry:
+    """Registry for the strategy loop: physically no execution/write tools exist here."""
+    reg = ToolRegistry()
+    for spec in _strategy_specs():
+        reg.register(spec)
+    return reg
+
+
 def build_default_registry() -> ToolRegistry:
     reg = ToolRegistry()
     reg.register(ToolSpec(
@@ -579,48 +633,6 @@ def build_default_registry() -> ToolRegistry:
             },
         }, handler=scan_setups, read_only=True, write_class="none",
     ))
-    reg.register(ToolSpec(
-        name="backtest_symbol",
-        description="Backtest a simple SMA crossover strategy for one ticker using daily price history.",
-        parameters={
-            "type": "object",
-            "properties": {
-                "ticker": {"type": "string"},
-                "strategy": {"type": "string", "enum": ["sma_crossover"], "default": "sma_crossover"},
-                "short_window": {"type": "integer", "minimum": 1, "default": 20},
-                "long_window": {"type": "integer", "minimum": 2, "default": 50},
-                "range": {"type": "string", "default": "3y"},
-            }, "required": ["ticker"],
-        }, handler=backtest_symbol, read_only=True, write_class="none",
-    ))
-    reg.register(ToolSpec(
-        name="backtest_basket",
-        description="Backtest momentum rotation over a basket of 2 to 30 tickers.",
-        parameters={
-            "type": "object",
-            "properties": {
-                "tickers": {"type": "array", "minItems": 2, "maxItems": 30, "items": {"type": "string"}},
-                "top_n": {"type": "integer", "minimum": 1, "default": 5},
-                "lookback_days": {"type": "integer", "minimum": 1, "default": 63},
-                "rebalance_freq": {"type": "string", "default": "ME"},
-                "benchmark": {"type": "string"},
-                "market": {"type": "string", "enum": ["IN", "US"]},
-                "years": {"type": "integer", "minimum": 1, "default": 3},
-            }, "required": ["tickers"],
-        }, handler=backtest_basket, read_only=True, write_class="none",
-    ))
-    reg.register(ToolSpec(
-        name="validate_backtest",
-        description="Run permutation and multi-window robustness checks on a backtest equity curve.",
-        parameters={
-            "type": "object",
-            "properties": {
-                "equity_curve": {"type": "array", "items": {"type": "object"}},
-                "metric": {"type": "string", "enum": ["sharpe", "total_return"], "default": "sharpe"},
-                "n_permutations": {"type": "integer", "minimum": 100, "maximum": 2000, "default": 500},
-                "n_windows": {"type": "integer", "minimum": 2, "maximum": 12, "default": 5},
-                "periods_per_year": {"type": "integer", "default": 252},
-            }, "required": ["equity_curve"],
-        }, handler=validate_backtest, read_only=True, write_class="none",
-    ))
+    for spec in _strategy_specs():
+        reg.register(spec)
     return reg

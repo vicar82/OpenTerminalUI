@@ -11,11 +11,13 @@ export function AgentConsole() {
   const open = useAgentStore((s) => s.open);
   const running = useAgentStore((s) => s.running);
   const debate = useAgentStore((s) => s.debate);
+  const strategy = useAgentStore((s) => s.strategy);
   const messages = useAgentStore((s) => s.messages);
   const artifacts = useAgentStore((s) => s.artifacts);
   const toggleOpen = useAgentStore((s) => s.toggleOpen);
   const setOpen = useAgentStore((s) => s.setOpen);
   const toggleDebate = useAgentStore((s) => s.toggleDebate);
+  const toggleStrategy = useAgentStore((s) => s.toggleStrategy);
   const startRun = useAgentStore((s) => s.startRun);
   // Subscribe to the active ticker so the context chip re-renders on symbol change.
   useStockStore((s) => s.ticker);
@@ -75,6 +77,20 @@ export function AgentConsole() {
           >
             Debate
           </button>
+          <button
+            type="button"
+            onClick={toggleStrategy}
+            aria-pressed={strategy}
+            aria-label="Toggle strategy lab mode"
+            title="Strategy Lab: bounded, read-only backtest iteration with out-of-sample validation"
+            className={`rounded border px-2 py-0.5 font-mono text-[10px] font-semibold uppercase tracking-wide transition-colors ${
+              strategy
+                ? "border-terminal-accent bg-terminal-accent text-terminal-bg"
+                : "border-terminal-border text-terminal-muted hover:border-terminal-accent hover:text-terminal-accent"
+            }`}
+          >
+            Strategy Lab
+          </button>
           {contextSymbol ? (
             <span
               title={`Default subject: ${contextSymbol} (the stock you have open)`}
@@ -115,6 +131,8 @@ export function AgentConsole() {
           placeholder={
             debate
               ? `Enter a ticker for multi-agent debate${contextSymbol ? ` (default ${contextSymbol})` : ""}…`
+              : strategy
+                ? `Enter a ticker for Strategy Lab${contextSymbol ? ` (default ${contextSymbol})` : ""}…`
               : contextSymbol
                 ? `Ask about ${contextSymbol} or any stock…`
                 : "Ask the agent to find or analyze stocks…"

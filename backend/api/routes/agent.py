@@ -9,7 +9,8 @@ from fastapi.responses import StreamingResponse
 
 from backend.agent.orchestrator import Orchestrator
 from backend.agent.debate import DebateOrchestrator
-from backend.agent.tools.market_tools import build_default_registry
+from backend.agent.strategy_loop import StrategyLoopOrchestrator
+from backend.agent.tools.market_tools import build_default_registry, build_strategy_registry
 from backend.auth.deps import get_current_user
 from backend.config.settings import get_settings
 from backend.services.llm.factory import get_llm_provider
@@ -51,20 +52,29 @@ async def stream_run(run_id: str, user=Depends(get_current_user)) -> StreamingRe
 
     settings = get_settings()
     provider = get_llm_provider(provider=spec["provider"], model=spec["model"])
-    registry = build_default_registry()
     if spec["mode"] == "debate":
         if not settings.agent_debate_enabled:
             raise HTTPException(status_code=403, detail="debate mode disabled")
         subject = (spec.get("ticker") or spec["prompt"]).strip()
         orchestrator = DebateOrchestrator(
             provider=provider,
-            registry=registry,
+            registry=build_default_registry(),
             analyst_max_steps=settings.agent_debate_analyst_max_steps,
+        )
+        run_args = (subject,)
+    elif spec["mode"] == "strategy":
+        if not settings.agent_strategy_loop_enabled:
+            raise HTTPException(status_code=403, detail="strategy mode disabled")
+        subject = (spec.get("ticker") or spec["prompt"]).strip()
+        orchestrator = StrategyLoopOrchestrator(
+            provider=provider,
+            registry=build_strategy_registry(),
+            max_rounds=settings.agent_strategy_loop_max_rounds,
         )
         run_args = (subject,)
     else:
         orchestrator = Orchestrator(
-            provider=provider, registry=registry,
+            provider=provider, registry=build_default_registry(),
             max_steps=settings.agent_deep_max_steps if spec["mode"] == "deep" else settings.agent_max_steps)
         run_args = (spec["prompt"],)
 

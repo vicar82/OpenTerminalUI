@@ -76,6 +76,8 @@ class AppSettings(BaseModel):
     agent_deep_max_steps: int = 24
     agent_debate_enabled: bool = False
     agent_debate_analyst_max_steps: int = 4
+    agent_strategy_loop_enabled: bool = False
+    agent_strategy_loop_max_rounds: int = 3
     agent_timeout_seconds: float = 120.0
     openrouter_base_url: str = "https://openrouter.ai/api/v1"
     openrouter_api_key: str | None = None
@@ -312,6 +314,15 @@ def get_settings() -> AppSettings:
         agent_debate_analyst_max_steps=int(
             _env("OPENTERMINALUI_AGENT_DEBATE_ANALYST_MAX_STEPS", "AGENT_DEBATE_ANALYST_MAX_STEPS")
             or str(app_cfg.get("agent_debate_analyst_max_steps", 4))
+        ),
+        agent_strategy_loop_enabled=_as_bool(
+            _env("OPENTERMINALUI_AGENT_STRATEGY_LOOP_ENABLED", "AGENT_STRATEGY_LOOP_ENABLED")
+            or app_cfg.get("agent_strategy_loop_enabled", False),
+            default=False,
+        ),
+        agent_strategy_loop_max_rounds=int(
+            _env("OPENTERMINALUI_AGENT_STRATEGY_LOOP_MAX_ROUNDS", "AGENT_STRATEGY_LOOP_MAX_ROUNDS")
+            or str(app_cfg.get("agent_strategy_loop_max_rounds", 3))
         ),
         agent_timeout_seconds=float(
             _env("OPENTERMINALUI_AGENT_TIMEOUT_SECONDS")
