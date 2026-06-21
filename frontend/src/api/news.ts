@@ -26,7 +26,7 @@ export async function searchLatestNews(q: string, limit = 100): Promise<NewsLate
 }
 
 export async function fetchNewsByTicker(ticker: string, limit = 100, market?: string): Promise<NewsLatestApiItem[]> {
-  const { data } = await api.get<{ items: NewsLatestApiItem[] }>(`/v1/news/ticker/${encodeURIComponent(ticker)}`, {
+  const { data } = await api.get<{ items: NewsLatestApiItem[] }>(`/news/by-ticker/${encodeURIComponent(ticker)}`, {
     params: { limit, market },
   });
   return Array.isArray(data?.items) ? data.items : [];

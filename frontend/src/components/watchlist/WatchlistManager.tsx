@@ -8,6 +8,7 @@ import {
   addWatchlistSymbols, removeWatchlistSymbol, searchSymbols
 } from "../../api/client";
 import { HeatmapView } from "./HeatmapView";
+import { fetchQuotesBatch } from "../../api/marketData";
 import { useQuotesStream, useQuotesStore } from "../../realtime/useQuotesStream";
 import { useSettingsStore } from "../../store/settingsStore";
 import { useDisplayCurrency } from "../../hooks/useDisplayCurrency";
@@ -72,6 +73,33 @@ export function WatchlistManager() {
     subscribe(activeWl.symbols);
     return () => unsubscribe(activeWl.symbols);
   }, [activeWl?.symbols, subscribe, unsubscribe]);
+
+  // REST fallback: when no live tick has arrived (markets closed / feed idle),
+  // show the last/snapshot price so the watchlist is never blank.
+  const restQuotesQuery = useQuery({
+    queryKey: ["watchlist-quotes", selectedMarket, activeWl?.symbols.join(",") || ""],
+    queryFn: () => fetchQuotesBatch(activeWl?.symbols || [], selectedMarket),
+    enabled: Boolean(activeWl?.symbols.length),
+    refetchInterval: 30_000,
+    staleTime: 15_000,
+  });
+  const restBySymbol = useMemo(() => {
+    const map: Record<string, { ltp: number; change_pct: number }> = {};
+    for (const q of restQuotesQuery.data?.quotes || []) {
+      map[String(q.symbol).toUpperCase()] = { ltp: q.last, change_pct: q.changePct };
+    }
+    return map;
+  }, [restQuotesQuery.data]);
+  // Merge a live tick with the REST fallback so callers get a single quote view.
+  const quoteFor = (symbol: string) => {
+    const live = ticksByToken[`${selectedMarket}:${symbol}`];
+    const rest = restBySymbol[symbol.toUpperCase()];
+    return {
+      ltp: live?.ltp ?? rest?.ltp,
+      change_pct: live?.change_pct ?? rest?.change_pct,
+      volume: live?.volume ?? null,
+    };
+  };
 
   // Mutations
   const createMut = useMutation({
@@ -157,7 +185,7 @@ export function WatchlistManager() {
   }, [queryClient]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const heatmapData = activeWl?.symbols.map(s => {
-    const live = ticksByToken[`${selectedMarket}:${s}`];
+    const live = quoteFor(s);
     return {
       ticker: s,
       changePct: live?.change_pct || 0,
@@ -259,7 +287,7 @@ export function WatchlistManager() {
                 <ExportButton
                   source="watchlist"
                   data={activeWl.symbols.map(s => {
-                    const live = ticksByToken[`${selectedMarket}:${s}`];
+                    const live = quoteFor(s);
                     return { symbol: s, price: live?.ltp, change_pct: live?.change_pct, volume: live?.volume };
                   })}
                   filename={`${activeWl.name}_watchlist.csv`}
@@ -328,7 +356,7 @@ export function WatchlistManager() {
                     </thead>
                     <tbody className="divide-y divide-terminal-border/30">
                       {activeWl.symbols.map(s => {
-                        const live = ticksByToken[`${selectedMarket}:${s}`];
+                        const live = quoteFor(s);
                         const changePct = live?.change_pct || 0;
                         return (
                           <tr

@@ -154,37 +154,39 @@ async def get_quotes(
         all_quotes.extend(adapter_quotes)
         return {"market": market_code, "quotes": all_quotes}
 
-    # --- US local symbols: Finnhub ---
+    # --- US local symbols: Finnhub (primary), Yahoo (fallback) ---
     if market_code in US_MARKETS:
-        if not fetcher.finnhub.api_key:
-            return {"market": market_code, "status": "unavailable", "quotes": all_quotes}
-
-        payloads = await asyncio.gather(
-            *(fetcher.finnhub.get_quote(symbol) for symbol in local_syms),
-            return_exceptions=True,
-        )
         local_quotes: list[dict[str, Any]] = []
-        for symbol, payload in zip(local_syms, payloads):
-            if isinstance(payload, Exception) or not isinstance(payload, dict):
-                continue
-            last = _to_float(payload.get("c"))
-            if last is None:
-                continue
-            change = _to_float(payload.get("d"))
-            change_pct = _to_float(payload.get("dp"))
-            epoch = payload.get("t")
-            ts_iso = now_iso
-            if isinstance(epoch, (int, float)) and epoch > 0:
-                ts_iso = datetime.fromtimestamp(epoch, tz=timezone.utc).isoformat()
-            local_quotes.append(
-                {
-                    "symbol": symbol,
-                    "last": last,
-                    "change": change if change is not None else 0.0,
-                    "changePct": change_pct if change_pct is not None else 0.0,
-                    "ts": ts_iso,
-                }
+        if fetcher.finnhub.api_key:
+            payloads = await asyncio.gather(
+                *(fetcher.finnhub.get_quote(symbol) for symbol in local_syms),
+                return_exceptions=True,
             )
+            for symbol, payload in zip(local_syms, payloads):
+                if isinstance(payload, Exception) or not isinstance(payload, dict):
+                    continue
+                last = _to_float(payload.get("c"))
+                if last is None:
+                    continue
+                change = _to_float(payload.get("d"))
+                change_pct = _to_float(payload.get("dp"))
+                epoch = payload.get("t")
+                ts_iso = now_iso
+                if isinstance(epoch, (int, float)) and epoch > 0:
+                    ts_iso = datetime.fromtimestamp(epoch, tz=timezone.utc).isoformat()
+                local_quotes.append(
+                    {
+                        "symbol": symbol,
+                        "last": last,
+                        "change": change if change is not None else 0.0,
+                        "changePct": change_pct if change_pct is not None else 0.0,
+                        "ts": ts_iso,
+                    }
+                )
+        # Finnhub unconfigured or returned nothing usable: fall back to Yahoo,
+        # which resolves bare US tickers (AAPL, MSFT, …) without a market suffix.
+        if not local_quotes:
+            local_quotes = await _fetch_yahoo_quotes(fetcher, local_syms, now_iso)
         all_quotes.extend(local_quotes)
         return {"market": market_code, "quotes": all_quotes}
 
