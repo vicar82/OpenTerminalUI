@@ -137,7 +137,7 @@ export function PortfolioLabPage() {
       </div>
 
       <div className="grid grid-cols-1 gap-3 xl:grid-cols-[1.2fr_1fr]">
-        <TerminalPanel title="Portfolio Definitions" subtitle="Saved universes and construction policies">
+        <TerminalPanel title="Определения портфелей" subtitle="Saved universes and construction policies">
           <div className="space-y-2 text-xs">
             {portfolios.isLoading && <div className="text-terminal-muted">Loading portfolios...</div>}
             {portfolios.isError && <div className="text-terminal-neg">Failed to load portfolios.</div>}
@@ -157,7 +157,7 @@ export function PortfolioLabPage() {
           </div>
         </TerminalPanel>
 
-        <TerminalPanel title="New Portfolio" subtitle="Universe + constraints + benchmark">
+        <TerminalPanel title="Новый портфель" subtitle="Universe + constraints + benchmark">
           <form onSubmit={onCreate} className="space-y-2 text-xs">
             <input className="w-full rounded border border-terminal-border bg-terminal-bg px-2 py-1" placeholder="Name" value={name} onChange={(e) => setName(e.target.value)} />
             <textarea className="w-full rounded border border-terminal-border bg-terminal-bg px-2 py-1" placeholder="Description" value={description} onChange={(e) => setDescription(e.target.value)} />
@@ -202,7 +202,7 @@ export function PortfolioLabPage() {
         </TerminalPanel>
       </div>
 
-      <TerminalPanel title="Portfolio Leaderboard" subtitle={`${leaderboardMarket} market / sortable construction quality`}>
+      <TerminalPanel title="Таблица лидеров портфелей" subtitle={`${leaderboardMarket} market / sortable construction quality`}>
         <div className="mb-2 flex flex-wrap items-center justify-between gap-2 text-xs">
           <div className="flex gap-1">
             {(["India", "US"] as const).map((marketOpt) => (

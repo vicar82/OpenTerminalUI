@@ -61,7 +61,7 @@ export function SettingsPage() {
 
   return (
     <div className="space-y-3 p-3">
-      <TerminalPanel title="UI Settings" subtitle="Dense terminal defaults">
+      <TerminalPanel title="Настройки интерфейса" subtitle="Dense terminal defaults">
         <div className="grid grid-cols-1 gap-2 lg:grid-cols-6">
           <TerminalInput as="select" value={selectedCountry} onChange={(e) => setSelectedCountry(e.target.value as CountryCode)}>
             <option value="IN">IN</option>
@@ -165,7 +165,7 @@ export function SettingsPage() {
         />
       </TerminalPanel>
 
-      <TerminalPanel title="Scheduled Reports">
+      <TerminalPanel title="Запланированные отчёты">
         <div className="grid grid-cols-1 gap-2 lg:grid-cols-5">
           <TerminalInput value={reportType} onChange={(e) => setReportType(e.target.value)} placeholder="report type" />
           <TerminalInput as="select" value={frequency} onChange={(e) => setFrequency(e.target.value)}>
@@ -213,7 +213,7 @@ export function SettingsPage() {
         </div>
       </TerminalPanel>
 
-      <TerminalPanel title="Data Export">
+      <TerminalPanel title="Экспорт данных">
         <div className="flex flex-wrap gap-2">
           {["watchlist", "positions", "trades", "screening_results", "backtest_trades"].map((kind) => (
             <div key={kind} className="flex items-center gap-1 rounded border border-terminal-border bg-terminal-bg px-2 py-1">
@@ -239,7 +239,7 @@ export function SettingsPage() {
         </div>
       </TerminalPanel>
 
-      <TerminalPanel title="Backtest Data">
+      <TerminalPanel title="Данные бэктеста">
         <ErrorBoundary>
           <DataManager />
         </ErrorBoundary>

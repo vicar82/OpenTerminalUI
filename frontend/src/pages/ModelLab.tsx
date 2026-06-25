@@ -144,7 +144,7 @@ export function ModelLabPage() {
         </div>
       </TerminalPanel>
 
-      <TerminalPanel title="Model Lab" subtitle="Experiment registry and builder">
+      <TerminalPanel title="Модельная лаборатория" subtitle="Experiment registry and builder">
         <div className="grid grid-cols-1 gap-2 md:grid-cols-5">
           <label className="text-xs">Tag
             <input
@@ -209,7 +209,7 @@ export function ModelLabPage() {
           </div>
         </TerminalPanel>
 
-        <TerminalPanel title="New Experiment" subtitle="Model + universe + cost profile">
+        <TerminalPanel title="Новый эксперимент" subtitle="Model + universe + cost profile">
           <form onSubmit={onCreate} className="space-y-2 text-xs">
             <input className="w-full rounded border border-terminal-border bg-terminal-bg px-2 py-1" value={name} onChange={(e) => setName(e.target.value)} placeholder="Name" />
             <textarea className="w-full rounded border border-terminal-border bg-terminal-bg px-2 py-1" value={description} onChange={(e) => setDescription(e.target.value)} placeholder="Description" />

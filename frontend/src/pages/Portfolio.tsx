@@ -693,7 +693,7 @@ export function PortfolioPage() {
             Legacy View
           </TerminalButton>
           <SavedViewsControl
-            pageLabel="Portfolio"
+            pageLabel="Портфель"
             capture={() => ({
               filters: { portfolioMode, portfolioView, portfolioSection, trendRange },
               activeTabs: { portfolioView, portfolioSection },
@@ -716,7 +716,7 @@ export function PortfolioPage() {
             Mode: Equity
           </span>
           <SavedViewsControl
-            pageLabel="Portfolio"
+            pageLabel="Портфель"
             capture={() => ({
               filters: { portfolioMode, portfolioView, portfolioSection, trendRange },
               activeTabs: { portfolioView, portfolioSection },
@@ -901,7 +901,7 @@ export function PortfolioPage() {
                 }
               }}
             >
-              {submitting ? "Adding..." : "Add Holding"}
+              {submitting ? "Adding..." : "Добавить позицию"}
             </TerminalButton>
           </div>
         </div>
@@ -1099,7 +1099,7 @@ export function PortfolioPage() {
                       <Tooltip
                         contentStyle={{ border: "1px solid #2a2f3a", background: "#0c0f14", color: "#d8dde7" }}
                         formatter={(value: number | string | undefined, name: string | undefined) =>
-                          name === "Portfolio Value" || name === "Invested Baseline"
+                          name === "Стоимость портфеля" || name === "Invested Baseline"
                             ? [formatInr(Number(value ?? 0)), name]
                             : name === "Return %"
                             ? [`${Number(value ?? 0).toFixed(2)}%`, "Return %"]
@@ -1131,7 +1131,7 @@ export function PortfolioPage() {
                         yAxisId="value"
                         type="monotone"
                         dataKey="value"
-                        name="Portfolio Value"
+                        name="Стоимость портфеля"
                         fill="#00c176"
                         fillOpacity={0.22}
                         stroke="#00c176"

@@ -158,7 +158,7 @@ export function PortfolioManager() {
           ))}
         </div>
         <div className="mt-3 space-y-1 border-t border-terminal-border pt-2">
-          <TerminalInput value={newName} onChange={(e) => setNewName(e.target.value)} placeholder="Portfolio name" />
+          <TerminalInput value={newName} onChange={(e) => setNewName(e.target.value)} placeholder="Название портфеля" />
           <select className="w-full rounded border border-terminal-border bg-terminal-bg px-2 py-1 text-xs" value={newBenchmark} onChange={(e) => setNewBenchmark(e.target.value)}>
             {BENCHMARKS.map((x) => <option key={x} value={x}>{x}</option>)}
           </select>

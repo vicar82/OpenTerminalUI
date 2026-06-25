@@ -1560,7 +1560,7 @@ export function BacktestingPage() {
   return (
     <div className="h-full space-y-3 overflow-y-auto px-3 py-2 pb-4">
       <TerminalPanel
-        title="Research Suites"
+        title="Исследовательские наборы"
         subtitle="Backtesting + Model Lab"
         actions={
           <SavedViewsControl
@@ -1584,7 +1584,7 @@ export function BacktestingPage() {
         </div>
       </TerminalPanel>
       <div className="grid grid-cols-1 gap-3 xl:grid-cols-[1fr_320px]">
-        <TerminalPanel title="Backtesting Control Deck" subtitle="Compact controls for chart-first workflow">
+        <TerminalPanel title="Панель управления бэктестингом" subtitle="Compact controls for chart-first workflow">
           <div className="grid grid-cols-1 gap-2 text-xs md:grid-cols-8">
             <label className="md:col-span-1"><span className="mb-1 block text-[11px] uppercase tracking-wide text-terminal-muted">Asset (Ticker)</span><div className="relative"><input className="w-full rounded border border-terminal-border bg-terminal-bg px-2 py-1 text-xs uppercase" value={asset} onChange={(e) => { const raw = e.target.value.toUpperCase().trim(); const prefixed = raw.match(/^(NSE|BSE|NYSE|NASDAQ|AMEX):([A-Z0-9._-]+)$/); if (prefixed) { const ex = prefixed[1] as BacktestMarket; setMarket(ex); setAsset(prefixed[2]); } else { if (raw.endsWith(".NS")) setMarket("NSE"); if (raw.endsWith(".BO")) setMarket("BSE"); setAsset(raw); } setShowAssetSuggestions(true); }} onFocus={() => setShowAssetSuggestions(true)} onBlur={() => window.setTimeout(() => setShowAssetSuggestions(false), 150)} />{showAssetSuggestions && assetSuggestions.length > 0 && <div className="absolute left-0 right-0 top-[calc(100%+2px)] z-20 max-h-48 overflow-auto rounded border border-terminal-border bg-terminal-panel shadow-lg">{assetSuggestions.map((item) => (<button key={`${item.ticker}:${item.name}`} type="button" className="flex w-full items-center justify-between border-b border-terminal-border/40 px-2 py-1 text-left text-xs hover:bg-terminal-bg" onMouseDown={(e) => e.preventDefault()} onClick={() => { setAsset((item.ticker || "").toUpperCase()); const ex = (item.exchange || "").toUpperCase(); if (KNOWN_MARKETS.includes(ex as BacktestMarket)) setMarket(ex as BacktestMarket); setShowAssetSuggestions(false); }}><span>{item.ticker}</span><span className="ml-2 truncate text-[10px] text-terminal-muted">{item.name}</span></button>))}</div>}</div></label>
             <label className="md:col-span-1"><span className="mb-1 block text-[11px] uppercase tracking-wide text-terminal-muted">Market</span><select className="w-full rounded border border-terminal-border bg-terminal-bg px-2 py-1 text-xs uppercase" value={market} onChange={(e) => setMarket(e.target.value as BacktestMarket)}><option value="NSE">NSE</option><option value="BSE">BSE</option><option value="NYSE">NYSE</option><option value="NASDAQ">NASDAQ</option><option value="AMEX">AMEX</option></select></label>
@@ -1652,12 +1652,12 @@ export function BacktestingPage() {
           {strategyMode === CUSTOM_STRATEGY_VALUE && <label className="mt-2 block"><span className="mb-1 block text-[11px] uppercase tracking-wide text-terminal-muted">Python Strategy Script</span><textarea className="h-36 w-full resize-none rounded border border-terminal-border bg-terminal-bg px-2 py-1 font-mono text-[11px] text-terminal-text" value={script} onChange={(e) => setScript(e.target.value)} /></label>}
           {error && <div className="mt-2 rounded border border-terminal-neg bg-terminal-neg/10 p-2 text-xs text-terminal-neg">{error}</div>}
         </TerminalPanel>
-        <TerminalPanel title="Backtest Performance" subtitle="Model result summary"><div className="space-y-2"><div className={`text-5xl font-bold tracking-tight ${returnClass}`}>{result?.result ? fmtPct(result.result.total_return) : "-"}</div><div className="grid grid-cols-2 gap-x-4 gap-y-1 text-sm text-terminal-text"><div className="text-terminal-muted">Initial Capital</div><div>{fmtMoney(initialCapital)}</div><div className="text-terminal-muted">Final Equity</div><div>{fmtMoney(finalEquity)}</div><div className="text-terminal-muted">Net P/L</div><div className={pnlAmount >= 0 ? "text-terminal-pos" : "text-terminal-neg"}>{fmtMoney(pnlAmount)}</div><div className="text-terminal-muted">Cash Left</div><div>{fmtMoney(endingCash)}</div><div className="text-terminal-muted">Sharpe</div><div>{result?.result ? result.result.sharpe.toFixed(2) : "-"}</div><div className="text-terminal-muted">Max Drawdown</div><div>{result?.result ? fmtPct(result.result.max_drawdown) : "-"}</div><div className="text-terminal-muted">Trades</div><div>{trades.length}</div><div className="text-terminal-muted">Total Qty</div><div>{totalTradeQty.toFixed(2)}</div></div><div className="border-t border-terminal-border/40 pt-2"><div className="grid grid-cols-2 gap-x-4 gap-y-1 text-xs text-terminal-text"><div className="text-terminal-muted">Win Rate</div><div>{(Number(analyticsSummary.win_rate) || 0).toFixed(2)}%</div><div className="text-terminal-muted">Profit Factor</div><div>{(Number(analyticsSummary.profit_factor) || 0).toFixed(2)}</div><div className="text-terminal-muted">Expectancy</div><div>{fmtMoney(Number(analyticsSummary.expectancy) || 0)}</div>{result?.result && (result.result.max_intraday_drawdown ?? 0) < 0 && (<><div className="text-terminal-muted">Max Intraday DD</div><div>{fmtPct(result.result.max_intraday_drawdown ?? 0)}</div><div className="text-terminal-muted">Avg Hold (Min)</div><div>{(result.result.average_hold_time_minutes || 0).toFixed(1)}m</div><div className="text-terminal-muted">Trades / Day</div><div>{(result.result.trades_per_day || 0).toFixed(1)}</div><div className="text-terminal-muted">Win Rate (AM/PM)</div><div>{(result.result.win_rate_morning || 0).toFixed(1)}% / {(result.result.win_rate_afternoon || 0).toFixed(1)}%</div></>)}</div></div></div></TerminalPanel>
+        <TerminalPanel title="Доходность бэктеста" subtitle="Model result summary"><div className="space-y-2"><div className={`text-5xl font-bold tracking-tight ${returnClass}`}>{result?.result ? fmtPct(result.result.total_return) : "-"}</div><div className="grid grid-cols-2 gap-x-4 gap-y-1 text-sm text-terminal-text"><div className="text-terminal-muted">Initial Capital</div><div>{fmtMoney(initialCapital)}</div><div className="text-terminal-muted">Final Equity</div><div>{fmtMoney(finalEquity)}</div><div className="text-terminal-muted">Net P/L</div><div className={pnlAmount >= 0 ? "text-terminal-pos" : "text-terminal-neg"}>{fmtMoney(pnlAmount)}</div><div className="text-terminal-muted">Cash Left</div><div>{fmtMoney(endingCash)}</div><div className="text-terminal-muted">Sharpe</div><div>{result?.result ? result.result.sharpe.toFixed(2) : "-"}</div><div className="text-terminal-muted">Max Drawdown</div><div>{result?.result ? fmtPct(result.result.max_drawdown) : "-"}</div><div className="text-terminal-muted">Trades</div><div>{trades.length}</div><div className="text-terminal-muted">Total Qty</div><div>{totalTradeQty.toFixed(2)}</div></div><div className="border-t border-terminal-border/40 pt-2"><div className="grid grid-cols-2 gap-x-4 gap-y-1 text-xs text-terminal-text"><div className="text-terminal-muted">Win Rate</div><div>{(Number(analyticsSummary.win_rate) || 0).toFixed(2)}%</div><div className="text-terminal-muted">Profit Factor</div><div>{(Number(analyticsSummary.profit_factor) || 0).toFixed(2)}</div><div className="text-terminal-muted">Expectancy</div><div>{fmtMoney(Number(analyticsSummary.expectancy) || 0)}</div>{result?.result && (result.result.max_intraday_drawdown ?? 0) < 0 && (<><div className="text-terminal-muted">Max Intraday DD</div><div>{fmtPct(result.result.max_intraday_drawdown ?? 0)}</div><div className="text-terminal-muted">Avg Hold (Min)</div><div>{(result.result.average_hold_time_minutes || 0).toFixed(1)}m</div><div className="text-terminal-muted">Trades / Day</div><div>{(result.result.trades_per_day || 0).toFixed(1)}</div><div className="text-terminal-muted">Win Rate (AM/PM)</div><div>{(result.result.win_rate_morning || 0).toFixed(1)}% / {(result.result.win_rate_afternoon || 0).toFixed(1)}%</div></>)}</div></div></div></TerminalPanel>
       </div>
 
       {result?.result && (
         <AiInsightCard
-          title="AI Backtest Analysis"
+          title="ИИ-анализ бэктеста"
           description={`${activePreset?.label || strategyMode} · Gemma assessment of return, risk, and overfitting`}
           fetcher={() =>
             explainBacktest(activePreset?.label || String(strategyMode), {
@@ -1682,7 +1682,7 @@ export function BacktestingPage() {
           <MosaicWorkspace renderers={proRenderers} onCommand={handleWorkspaceCommand} />
         </TerminalPanel>
       ) : (
-        <TerminalPanel title="Backtest Visualizations" subtitle={`${tradedAsset} ${market}`}>
+        <TerminalPanel title="Визуализации бэктеста" subtitle={`${tradedAsset} ${market}`}>
           <div className="mb-3 flex flex-wrap gap-2">
             {VIZ_TABS.map((tab) => {
               const active = tab.key === activeTab;
@@ -1715,7 +1715,7 @@ export function BacktestingPage() {
         <TerminalPanel title="Walk-Forward + Sensitivity" subtitle="Validation timeline and parameter response">
           <div className="space-y-3">
             <WalkForwardTimeline windows={walkForwardWindows} />
-            <ParameterSensitivityHeatmap rows={sensitivityRows} title="Backtest Parameter Sensitivity" />
+            <ParameterSensitivityHeatmap rows={sensitivityRows} title="Чувствительность параметров" />
           </div>
         </TerminalPanel>
       </div>

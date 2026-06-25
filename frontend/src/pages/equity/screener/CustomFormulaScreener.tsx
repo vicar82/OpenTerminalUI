@@ -112,7 +112,7 @@ export function CustomFormulaScreener() {
   return (
     <section className="space-y-3">
       <div className="grid grid-cols-1 gap-3 xl:grid-cols-[minmax(0,1.2fr)_minmax(320px,0.8fr)]">
-        <TerminalPanel title="Formula Editor" subtitle="Computed Ratio Builder" bodyClassName="space-y-3">
+        <TerminalPanel title="Редактор формул" subtitle="Computed Ratio Builder" bodyClassName="space-y-3">
           <TerminalInput
             as="textarea"
             rows={7}
@@ -195,7 +195,7 @@ export function CustomFormulaScreener() {
           {error ? <div className="rounded-sm border border-terminal-neg bg-terminal-neg/10 px-2 py-1 text-xs text-terminal-neg">{error}</div> : null}
         </TerminalPanel>
 
-        <TerminalPanel title="Saved Formulas" subtitle="Load Or Persist" bodyClassName="space-y-3">
+        <TerminalPanel title="Сохранённые формулы" subtitle="Загрузить или сохранить" bodyClassName="space-y-3">
           <TerminalInput as="select" value={selectedSavedId} onChange={(event) => setSelectedSavedId(event.target.value)}>
             <option value="">Load saved formula</option>
             {savedFormulas.map((item) => (
@@ -341,7 +341,7 @@ export function CustomFormulaScreener() {
       <TerminalModal
         open={saveOpen}
         onClose={() => setSaveOpen(false)}
-        title="Save Formula"
+        title="Сохранить формулу"
         subtitle="Persist custom screener formula"
         footer={
           <div className="flex justify-end gap-2">

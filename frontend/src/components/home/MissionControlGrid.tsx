@@ -61,7 +61,7 @@ export function MissionControlGrid() {
 
   return (
     <div className="grid grid-cols-1 gap-3 p-3 md:grid-cols-2 xl:grid-cols-3">
-      <MissionControlPanel title="Market Pulse" accent={marketOpen ? "pos" : "neg"}>
+      <MissionControlPanel title="Пульс рынка" accent={marketOpen ? "pos" : "neg"}>
         <div className="space-y-2">
           {marketRows.map((row) => (
             <div key={row.key} className="grid grid-cols-[1fr_auto_auto] items-center gap-2 rounded-sm border border-terminal-border/80 px-2 py-1.5">
@@ -104,7 +104,7 @@ export function MissionControlGrid() {
         </div>
       </MissionControlPanel>
 
-      <MissionControlPanel title="System Snapshot">
+      <MissionControlPanel title="Снимок системы">
         <div className="space-y-2 text-xs">
           <div className="rounded-sm border border-terminal-border/80 px-2 py-1.5">
             <span className="text-terminal-muted">Data Mode</span>

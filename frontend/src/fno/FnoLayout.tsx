@@ -19,7 +19,7 @@ const LINKS = [
   { to: "/fno/strategy", label: "Strategy", key: "F5" },
   { to: "/fno/pcr", label: "PCR", key: "F6" },
   { to: "/fno/flow", label: "Flow", key: "F7" },
-  { to: "/fno/expiry", label: "Expiry", key: "F8" },
+  { to: "/fno/expiry", label: "Экспирация", key: "F8" },
   { to: "/fno/about", label: "About", key: "F9" },
 ] as const;
 
@@ -37,7 +37,7 @@ function FnoRightRail({ symbol, expiry, expiries, market }: { symbol: string; ex
       </div>
       <div className="flex-1 space-y-2 overflow-auto p-2">
         <TerminalPanel
-          title="Active Contract"
+          title="Активный контракт"
           subtitle="Current routing context"
           actions={<TerminalBadge variant="accent">{market}</TerminalBadge>}
           bodyClassName="space-y-2"

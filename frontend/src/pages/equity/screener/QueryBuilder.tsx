@@ -51,7 +51,7 @@ export function QueryBuilder() {
   }
 
   return (
-    <TerminalPanel title="Query Builder" subtitle="GUI Filters" bodyClassName="space-y-2">
+    <TerminalPanel title="Query Builder" subtitle="Фильтры GUI" bodyClassName="space-y-2">
       {validationError ? <div className="rounded-sm border border-terminal-neg bg-terminal-neg/10 px-2 py-1 text-xs text-terminal-neg">{validationError}</div> : null}
       {rows.map((row, index) => (
         <div key={index} className="grid grid-cols-[1fr_86px_1fr_78px_84px] gap-1">

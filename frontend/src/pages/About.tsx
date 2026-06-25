@@ -317,7 +317,7 @@ export function AboutPage({ terminalType = "market" }: AboutProps) {
         </div>
         <div className="flex items-center gap-2">
           <TerminalBadge variant="neutral">Esc</TerminalBadge>
-          <TerminalButton type="button" size="sm" onClick={() => navigate(-1)} aria-label="Go back">
+          <TerminalButton type="button" size="sm" onClick={() => navigate(-1)} aria-label="Назад">
             Back
           </TerminalButton>
         </div>
@@ -377,7 +377,7 @@ export function AboutPage({ terminalType = "market" }: AboutProps) {
                 <div className="text-[10px] uppercase tracking-[0.16em] text-terminal-muted">Fast Access</div>
                 <div className="mt-3 grid gap-2">
                   <QuickNavLink label="Return To Desk" to={returnRoute} badge={terminalType === "fno" ? "F&O" : "EQ"} />
-                  <QuickNavLink label="Open Home" to="/" badge="HOME" />
+                  <QuickNavLink label="Открыть главную" to="/" badge="HOME" />
                   <QuickNavLink label="Launch Security Hub" to="/equity/security" badge="SH" />
                 </div>
               </div>
@@ -411,8 +411,8 @@ export function AboutPage({ terminalType = "market" }: AboutProps) {
       </ul>
 
       <div className="grid gap-3 xl:grid-cols-[1.05fr_0.95fr]">
-        <TerminalPanel title="What's New" actions={<TerminalBadge variant="live">Release</TerminalBadge>}>
-          <section aria-label="What's New" className="space-y-2">
+        <TerminalPanel title="Что нового" actions={<TerminalBadge variant="live">Release</TerminalBadge>}>
+          <section aria-label="Что нового" className="space-y-2">
             {CHANGELOG_ITEMS.map((item) => (
               <article
                 key={`${item.kind}-${item.title}`}
@@ -438,8 +438,8 @@ export function AboutPage({ terminalType = "market" }: AboutProps) {
           </section>
         </TerminalPanel>
 
-        <TerminalPanel title="Tech Stack" actions={<TerminalBadge variant="info">Stack</TerminalBadge>}>
-          <section aria-label="Tech Stack" className="grid gap-2 sm:grid-cols-2">
+        <TerminalPanel title="Технологический стек" actions={<TerminalBadge variant="info">Stack</TerminalBadge>}>
+          <section aria-label="Технологический стек" className="grid gap-2 sm:grid-cols-2">
             {TECH_STACK.map((item) => (
               <div key={item.label} className="rounded-sm border border-terminal-border/70 bg-terminal-bg/45 p-3">
                 <div className="text-[10px] uppercase tracking-[0.14em] text-terminal-muted">{item.label}</div>
@@ -450,8 +450,8 @@ export function AboutPage({ terminalType = "market" }: AboutProps) {
         </TerminalPanel>
       </div>
 
-      <TerminalPanel title="Module Registry" actions={<TerminalBadge variant="accent">Indexed</TerminalBadge>}>
-        <section aria-label="Module Registry" className="grid gap-3 lg:grid-cols-2">
+      <TerminalPanel title="Реестр модулей" actions={<TerminalBadge variant="accent">Indexed</TerminalBadge>}>
+        <section aria-label="Реестр модулей" className="grid gap-3 lg:grid-cols-2">
           {MODULE_GROUPS.map((group) => (
             <RegistryGroup key={group.title} title={group.title} items={group.items} />
           ))}
@@ -459,8 +459,8 @@ export function AboutPage({ terminalType = "market" }: AboutProps) {
       </TerminalPanel>
 
       <div className="grid gap-3 xl:grid-cols-[1.1fr_0.9fr]">
-        <TerminalPanel title="Quick Navigation" actions={<TerminalBadge variant="info">Routes</TerminalBadge>}>
-          <section aria-label="Quick Navigation" className="grid gap-2 sm:grid-cols-2 xl:grid-cols-3">
+        <TerminalPanel title="Быстрая навигация" actions={<TerminalBadge variant="info">Routes</TerminalBadge>}>
+          <section aria-label="Быстрая навигация" className="grid gap-2 sm:grid-cols-2 xl:grid-cols-3">
             {QUICK_LINKS.map((item) => (
               <QuickNavLink key={item.label} label={item.label} to={item.to} badge={item.badge} />
             ))}
@@ -500,7 +500,7 @@ export function AboutPage({ terminalType = "market" }: AboutProps) {
                 target="_blank"
                 rel="noopener noreferrer"
                 className="inline-flex min-h-8 items-center justify-center rounded-sm border border-terminal-accent bg-terminal-accent/20 px-3 py-1 text-[10px] uppercase tracking-[0.14em] text-terminal-accent"
-                aria-label="Open GitHub"
+                aria-label="Открыть GitHub"
               >
                 Open GitHub
               </a>

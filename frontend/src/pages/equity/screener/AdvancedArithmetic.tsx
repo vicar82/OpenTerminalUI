@@ -14,7 +14,7 @@ export function AdvancedArithmetic() {
   const [value, setValue] = useState("3");
 
   return (
-    <TerminalPanel title="Advanced Arithmetic" subtitle="Expression Builder" bodyClassName="space-y-1">
+    <TerminalPanel title="Расширенная арифметика" subtitle="Expression Builder" bodyClassName="space-y-1">
       <div className="grid grid-cols-5 gap-1">
         <TerminalInput value={left} onChange={(event) => setLeft(event.target.value)} />
         <TerminalInput value={op} onChange={(event) => setOp(event.target.value)} />

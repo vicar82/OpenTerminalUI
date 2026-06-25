@@ -164,7 +164,7 @@ export function AlertBuilder({
         <section className="space-y-2">
           <div className="font-semibold text-terminal-accent">Symbol</div>
           <input
-            aria-label="Symbol"
+            aria-label="Символ"
             className="w-full rounded border border-terminal-border bg-terminal-bg px-2 py-2 uppercase"
             value={symbol}
             onChange={(event) => setSymbol(event.target.value)}
@@ -403,7 +403,7 @@ export function AlertBuilder({
           <div className="space-y-1">
             <div className="font-semibold text-terminal-accent">Expiry</div>
             <input
-              aria-label="Expiry Date"
+              aria-label="Дата истечения"
               type="datetime-local"
               className="w-full rounded border border-terminal-border bg-terminal-bg px-2 py-2"
               value={expiryDate}
@@ -413,7 +413,7 @@ export function AlertBuilder({
           <div className="space-y-1">
             <div className="font-semibold text-terminal-accent">Max Triggers</div>
             <input
-              aria-label="Max Triggers"
+              aria-label="Макс. срабатываний"
               type="number"
               className="w-full rounded border border-terminal-border bg-terminal-bg px-2 py-2"
               value={maxTriggers}

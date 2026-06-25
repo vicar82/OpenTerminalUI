@@ -2414,7 +2414,7 @@ export function TradingChart({
           type="button"
           className="rounded border border-terminal-border px-1.5 py-0.5 text-terminal-muted"
           onClick={handleExportPng}
-          aria-label="Export chart PNG"
+          aria-label="Экспорт PNG графика"
           data-testid="chart-export-png"
         >
           PNG
@@ -2423,7 +2423,7 @@ export function TradingChart({
           type="button"
           className="rounded border border-terminal-border px-1.5 py-0.5 text-terminal-muted"
           onClick={handleExportCsv}
-          aria-label="Export chart CSV"
+          aria-label="Экспорт CSV графика"
           data-testid="chart-export-csv"
         >
           CSV

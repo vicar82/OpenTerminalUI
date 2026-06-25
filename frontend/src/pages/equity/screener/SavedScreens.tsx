@@ -20,7 +20,7 @@ export function SavedScreens() {
   const [error, setError] = useState<string | null>(null);
 
   return (
-    <TerminalPanel title="Saved Screens" subtitle={`Count: ${savedScreens.length}`}>
+    <TerminalPanel title="Сохранённые экраны" subtitle={`Count: ${savedScreens.length}`}>
       {error ? <div className="mb-2 rounded-sm border border-terminal-neg bg-terminal-neg/10 px-2 py-1 text-xs text-terminal-neg">{error}</div> : null}
       <div className="space-y-1 text-xs">
         {savedScreens.map((screen) => (

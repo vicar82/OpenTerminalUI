@@ -110,9 +110,9 @@ export function BondsPage() {
                 className="h-7 rounded border border-terminal-border bg-terminal-bg px-2 text-xs text-terminal-text"
               >
                 <option value="">All</option>
-                <option value="Corporate">Corporate</option>
-                <option value="G-Sec">G-Sec</option>
-                <option value="Banking">Banking</option>
+                <option value="Корпоративные">Corporate</option>
+                <option value="Гос. облигации">G-Sec</option>
+                <option value="Банковские">Banking</option>
                 <option value="PSU">PSU</option>
               </select>
             </div>
@@ -158,7 +158,7 @@ export function BondsPage() {
 
       {section === "credit-spreads" && (
         <div className="grid grid-cols-1 gap-4 xl:grid-cols-3">
-          <TerminalPanel title="Spread Summary" className="xl:col-span-1">
+          <TerminalPanel title="Сводка спредов" className="xl:col-span-1">
             <div className="space-y-3 p-3 text-xs">
               {latestSpread ? (
                 <>
@@ -208,7 +208,7 @@ export function BondsPage() {
       )}
 
       {section === "migrations" && (
-        <TerminalPanel title="Rating Migration Tracker">
+        <TerminalPanel title="Трекер миграции рейтингов">
           <div className="overflow-auto">
             <table className="w-full text-xs">
               <thead>

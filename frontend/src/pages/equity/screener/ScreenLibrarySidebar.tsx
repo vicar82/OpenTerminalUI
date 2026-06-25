@@ -32,7 +32,7 @@ export function ScreenLibrarySidebar() {
   };
 
   return (
-    <TerminalPanel title="Screener Library" subtitle="Preset Screens" className="h-full" bodyClassName="space-y-3 overflow-auto">
+    <TerminalPanel title="Библиотека скринера" subtitle="Предустановленные экраны" className="h-full" bodyClassName="space-y-3 overflow-auto">
       <TerminalCombobox
         value={query}
         onChange={(value) => {
@@ -57,7 +57,7 @@ export function ScreenLibrarySidebar() {
             setOpen(false);
           }
         }}
-        placeholder="Search presets"
+        placeholder="Поиск предустановок"
         open={open}
         items={searchablePresets.slice(0, 8)}
         selectedIndex={selectedIdx}

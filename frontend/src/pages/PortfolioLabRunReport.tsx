@@ -247,7 +247,7 @@ export function PortfolioLabRunReportPage() {
           </div>
 
           <div className="grid grid-cols-1 gap-3 xl:grid-cols-3">
-            <TerminalPanel title="Top Contributors" subtitle="Period contribution">
+            <TerminalPanel title="Лучшие контрибьюторы" subtitle="Period contribution">
               <div className="space-y-1 text-xs">{(reportQuery.data.tables.top_contributors || []).map((row) => <div key={row.asset} className="flex justify-between"><span>{row.asset}</span><span>{pct(row.contribution)}</span></div>)}</div>
             </TerminalPanel>
             <TerminalPanel title="Top Detractors" subtitle="Period contribution">

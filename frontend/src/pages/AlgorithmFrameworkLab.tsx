@@ -335,7 +335,7 @@ export function AlgorithmFrameworkLab() {
             </div>
           </TerminalPanel>
 
-          <TerminalPanel title="Portfolio Construction" subtitle="Weighting logic">
+          <TerminalPanel title="Построение портфеля" subtitle="Weighting logic">
             <div className="space-y-3">
               <select
                 className="w-full bg-terminal-bg border border-terminal-border rounded px-2 py-1 text-xs text-terminal-text focus:border-terminal-accent outline-none"
@@ -353,7 +353,7 @@ export function AlgorithmFrameworkLab() {
             </div>
           </TerminalPanel>
 
-          <TerminalPanel title="Risk Overlay" subtitle="Constraint models">
+          <TerminalPanel title="Риск-оверлей" subtitle="Constraint models">
             <div className="space-y-4">
               <div className="flex flex-wrap gap-2">
                 {models?.risk.map(m => (

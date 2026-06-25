@@ -59,7 +59,7 @@ export function FactorDashboardPage() {
 
   return (
     <div className="space-y-3 p-3">
-      <TerminalPanel title="Factor Dashboard" subtitle="Top-quintile stock-picking ideas">
+      <TerminalPanel title="Факторная панель" subtitle="Top-quintile stock-picking ideas">
         <div className="grid grid-cols-1 gap-2 text-xs md:grid-cols-[220px_260px_1fr]">
           <div className="flex gap-1">
             {(["India", "US"] as const).map((item) => (

@@ -99,7 +99,7 @@ const CockpitDashboard = lazyWithRetry(() => import("./pages/Cockpit"));
 const RouteLoadingFallback = (
   <div className="flex min-h-[50vh] items-center justify-center p-4">
     <div className="rounded-sm border border-terminal-border bg-terminal-panel px-4 py-3 text-xs text-terminal-muted">
-      Loading workspace...
+      Загрузка рабочего пространства...
     </div>
   </div>
 );

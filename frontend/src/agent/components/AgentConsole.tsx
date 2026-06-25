@@ -50,7 +50,7 @@ export function AgentConsole() {
     <aside
       className={`ot-agent-panel${open ? "" : " ot-agent-panel--closed"}`}
       role="dialog"
-      aria-label="Agent Console"
+      aria-label="Консоль агента"
       aria-hidden={!open}
     >
       <header
@@ -67,7 +67,7 @@ export function AgentConsole() {
             type="button"
             onClick={toggleDebate}
             aria-pressed={debate}
-            aria-label="Toggle multi-agent debate mode"
+            aria-label="Переключить режим мульти-агентных дебатов"
             title="Multi-agent debate: analyst team → bull vs bear → portfolio-manager decision"
             className={`rounded border px-2 py-0.5 font-mono text-[10px] font-semibold uppercase tracking-wide transition-colors ${
               debate
@@ -81,7 +81,7 @@ export function AgentConsole() {
             type="button"
             onClick={toggleStrategy}
             aria-pressed={strategy}
-            aria-label="Toggle strategy lab mode"
+            aria-label="Переключить режим лаборатории стратегий"
             title="Strategy Lab: bounded, read-only backtest iteration with out-of-sample validation"
             className={`rounded border px-2 py-0.5 font-mono text-[10px] font-semibold uppercase tracking-wide transition-colors ${
               strategy
@@ -111,7 +111,7 @@ export function AgentConsole() {
         <button
           type="button"
           onClick={() => setOpen(false)}
-          aria-label="Close agent console"
+          aria-label="Закрыть консоль агента"
           style={{ background: "transparent", border: "none", color: "var(--ot-color-text-muted)", cursor: "pointer", fontSize: 16 }}
         >
           ✕
@@ -137,7 +137,7 @@ export function AgentConsole() {
                 ? `Ask about ${contextSymbol} or any stock…`
                 : "Ask the agent to find or analyze stocks…"
           }
-          aria-label="Agent prompt"
+          aria-label="Запрос агенту"
           style={{
             flex: 1, background: "var(--ot-color-canvas-elevated)",
             border: "1px solid var(--ot-color-border-default)", borderRadius: "var(--ot-radius-sm)",

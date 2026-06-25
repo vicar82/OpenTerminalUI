@@ -311,7 +311,7 @@ export function AccountPage() {
   if (!user) {
     return (
       <div className="space-y-3 p-3">
-        <TerminalPanel title="Account" subtitle="User details">
+        <TerminalPanel title="Аккаунт" subtitle="User details">
           <div className="text-xs text-terminal-muted">No authenticated user.</div>
         </TerminalPanel>
       </div>
@@ -449,7 +449,7 @@ export function AccountPage() {
           {message ? (
             <TerminalBadge variant={message.tone === "success" ? "success" : "warn"}>{message.text}</TerminalBadge>
           ) : null}
-          <TerminalButton type="button" size="sm" onClick={() => navigate(-1)} aria-label="Go back">
+          <TerminalButton type="button" size="sm" onClick={() => navigate(-1)} aria-label="Назад">
             Back
           </TerminalButton>
           <TerminalButton type="submit" size="sm" variant="accent" aria-label="Save profile">
@@ -571,7 +571,7 @@ export function AccountPage() {
 
       <div className="grid gap-3 xl:grid-cols-[1.08fr_0.92fr]">
         <TerminalPanel
-          title="Profile Dossier"
+          title="Досье профиля"
           subtitle="Personal details, desk defaults, and security posture"
           actions={<TerminalBadge variant="accent">Editable</TerminalBadge>}
         >
@@ -775,7 +775,7 @@ export function AccountPage() {
                   logout();
                   navigate("/login");
                 }}
-                aria-label="Logout"
+                aria-label="Выйти"
               >
                 Logout
               </TerminalButton>

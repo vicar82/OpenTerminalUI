@@ -310,13 +310,13 @@ function TechnicalsCard({ data }: { data: Technicals }) {
         {data?.note ? <span className="text-xs text-terminal-muted">{data.note}</span> : null}
       </div>
       <div className="grid grid-cols-3 gap-1.5">
-        <Metric label="Price" value={displayNum(data?.price)} />
-        <Metric label="Above 50 DMA" value={data?.trend?.above_50dma == null ? "—" : data.trend.above_50dma ? "Yes" : "No"} tone={data?.trend?.above_50dma ? "text-terminal-pos" : "text-terminal-neg"} />
-        <Metric label="Above 200 DMA" value={data?.trend?.above_200dma == null ? "—" : data.trend.above_200dma ? "Yes" : "No"} tone={data?.trend?.above_200dma ? "text-terminal-pos" : "text-terminal-neg"} />
+        <Metric label="Цена" value={displayNum(data?.price)} />
+        <Metric label="Выше 50-дневной SMA" value={data?.trend?.above_50dma == null ? "—" : data.trend.above_50dma ? "Yes" : "No"} tone={data?.trend?.above_50dma ? "text-terminal-pos" : "text-terminal-neg"} />
+        <Metric label="Выше 200-дневной SMA" value={data?.trend?.above_200dma == null ? "—" : data.trend.above_200dma ? "Yes" : "No"} tone={data?.trend?.above_200dma ? "text-terminal-pos" : "text-terminal-neg"} />
         <Metric label="RSI 14" value={displayNum(data?.momentum?.rsi_14)} />
         <Metric label="ATR %" value={displayNum(data?.volatility?.atr_pct, "%")} />
         <Metric label="RVOL 20" value={displayNum(data?.volume?.rvol_20)} />
-        <Metric label="From 20D High" value={displayNum(data?.distance_from_20d_high_pct, "%")} />
+        <Metric label="От 20-дневного максимума" value={displayNum(data?.distance_from_20d_high_pct, "%")} />
       </div>
       {setups.length ? (
         <div className="flex flex-wrap gap-1">

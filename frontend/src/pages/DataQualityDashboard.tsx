@@ -46,7 +46,7 @@ export function DataQualityDashboard() {
   return (
     <div className="space-y-3 p-4">
       <div className="grid gap-3 lg:grid-cols-4">
-        <TerminalPanel title="System Status">
+        <TerminalPanel title="Состояние системы">
           <div className="mt-4 flex items-center gap-2">
             <TerminalBadge variant={health.status === "healthy" ? "success" : "warn"}>
               {health.status.toUpperCase()}
@@ -65,7 +65,7 @@ export function DataQualityDashboard() {
         </TerminalPanel>
       </div>
 
-      <TerminalPanel title="Active Issues" subtitle="Critical and warning level data events">
+      <TerminalPanel title="Активные проблемы" subtitle="Critical and warning level data events">
         <TerminalTable
           rows={health.issues}
           rowKey={(r, i) => r.type + i}
@@ -81,7 +81,7 @@ export function DataQualityDashboard() {
         />
       </TerminalPanel>
 
-      <TerminalPanel title="Backfill Progress">
+      <TerminalPanel title="Прогресс бэкфилла">
         <TerminalTable
           rows={backfill}
           rowKey={(r) => r.task}

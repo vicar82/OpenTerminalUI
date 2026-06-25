@@ -34,9 +34,9 @@ import type { ChartPoint } from "../types";
 type HubTab = "overview" | "financials" | "chart" | "news" | "ownership" | "estimates" | "peers" | "esg" | "tape" | "insider";
 
 const HUB_TABS: TerminalTabItem[] = [
-  { id: "overview", label: "Overview" },
+  { id: "overview", label: "Обзор" },
   { id: "financials", label: "Financials" },
-  { id: "chart", label: "Chart" },
+  { id: "chart", label: "График" },
   { id: "news", label: "News" },
   { id: "ownership", label: "Ownership" },
   { id: "estimates", label: "Estimates" },
@@ -353,7 +353,7 @@ export function SecurityHubPage() {
 
         {tab === "overview" ? (
           <div className="grid grid-cols-1 gap-2 xl:grid-cols-[1.2fr_1fr]">
-            <TerminalPanel title="Overview" subtitle="DES-style snapshot" bodyClassName="grid gap-2">
+            <TerminalPanel title="Обзор" subtitle="DES-style snapshot" bodyClassName="grid gap-2">
               <div className="grid grid-cols-2 gap-2 lg:grid-cols-4">
                 <MetricCell label="Market Cap" value={fmtNum(marketCap)} />
                 <MetricCell label="P/E" value={fmtNum(peRatio)} />
@@ -393,10 +393,10 @@ export function SecurityHubPage() {
               </div>
             </TerminalPanel>
 
-            <TerminalPanel title="6M Price Chart" subtitle="Compact overview chart" bodyClassName="space-y-2">
+            <TerminalPanel title="График цены 6М" subtitle="Compact overview chart" bodyClassName="space-y-2">
               <TinyPriceChart points={histData} />
               <div className="grid grid-cols-3 gap-2 text-xs">
-                <MetricCell label="Prev Close" value={fmtNum(stock.previous_close)} />
+                <MetricCell label="Пред. закрытие" value={fmtNum(stock.previous_close)} />
                 <MetricCell label="Avg Volume" value={fmtNum(stock.avg_volume)} />
                 <MetricCell label="Beta" value={fmtNum(stock.beta)} />
               </div>
@@ -447,7 +447,7 @@ export function SecurityHubPage() {
 
         {tab === "chart" ? (
           <TerminalPanel
-            title="Chart"
+            title="График"
             subtitle="Security price history"
             actions={
               <div className="flex items-center gap-2">
@@ -682,9 +682,9 @@ export function SecurityHubPage() {
             <div className="grid gap-2 lg:grid-cols-3">
               <MetricCell label="Environmental" value={fmtNum(esgLatest.environmentalScore ?? esgLatest.environmental_score ?? (stock as Record<string, unknown>).esg_environment)} />
               <MetricCell label="Social" value={fmtNum(esgLatest.socialScore ?? esgLatest.social_score ?? (stock as Record<string, unknown>).esg_social)} />
-              <MetricCell label="Governance" value={fmtNum(esgLatest.governanceScore ?? esgLatest.governance_score ?? (stock as Record<string, unknown>).esg_governance)} />
+              <MetricCell label="Управление" value={fmtNum(esgLatest.governanceScore ?? esgLatest.governance_score ?? (stock as Record<string, unknown>).esg_governance)} />
               <MetricCell label="Total ESG" value={fmtNum(esgLatest.ESGScore ?? esgLatest.esgScore ?? esgLatest.esg_score)} />
-              <MetricCell label="Risk Rating" value={String(esgLatest.rating || esgLatest.esgRiskRating || "N/A")} />
+              <MetricCell label="Риск-рейтинг" value={String(esgLatest.rating || esgLatest.esgRiskRating || "N/A")} />
               <MetricCell label="Date" value={String(esgLatest.date || esgLatest.asOfDate || "N/A")} />
               <div className="lg:col-span-3">
                 <DenseTable

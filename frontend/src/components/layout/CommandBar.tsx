@@ -675,7 +675,7 @@ export function CommandBar({ onExecute }: Props) {
       className="relative z-40 border-b border-terminal-border bg-[#0D1117]/95 px-3 py-2 backdrop-blur supports-[backdrop-filter]:bg-[#0D1117]/88"
       role={isOpen || aiOpen ? "dialog" : undefined}
       aria-modal={isOpen || aiOpen ? true : undefined}
-      aria-label="Command palette"
+      aria-label="Командная палитра"
       onKeyDown={(event) => {
         if (event.key !== "Tab" || (!isOpen && !aiOpen)) return;
         const focusable = Array.from(
@@ -767,7 +767,7 @@ export function CommandBar({ onExecute }: Props) {
           }}
           className="h-8 min-w-0 flex-1 bg-transparent px-0 text-sm text-terminal-text outline-none placeholder:text-[#6E7681] ot-type-data"
           style={{ caretColor: "#FF6B00", fontFamily: '"Fira Code", var(--ot-font-data)' }}
-          placeholder="Type ticker, command, or search... (Ctrl+G)"
+          placeholder="Введите тикер, команду или поиск... (Ctrl+G)"
           aria-label="Command bar"
           role="combobox"
           aria-autocomplete="list"

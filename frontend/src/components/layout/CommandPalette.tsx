@@ -317,7 +317,7 @@ export function CommandPalette() {
           size="lg"
           tone="ui"
           className="h-11 rounded-none border-0 border-b border-terminal-border bg-terminal-bg px-3 text-sm text-terminal-text focus:border-terminal-accent"
-          placeholder="Type function code, alias, or ticker..."
+          placeholder="Введите код функции, псевдоним или тикер..."
         />
         <div className="max-h-[52vh] overflow-auto py-1">
           {items.map((item, idx) => (

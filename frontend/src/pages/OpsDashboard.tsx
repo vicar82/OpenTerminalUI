@@ -128,7 +128,7 @@ export function OpsDashboardPage() {
 
         {activeTab === "pm" && (
           <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-            <TerminalPanel title="PORTFOLIO REBALANCING">
+            <TerminalPanel title="РЕБАЛАНСИРОВКА ПОРТФЕЛЯ">
               <div className="p-1 space-y-2">
                 <div className="text-[10px] text-terminal-muted mb-2">Drift monitoring & target weight alignment.</div>
                 <button className="w-full p-2 border border-terminal-border bg-terminal-panel hover:bg-terminal-border/20 text-[10px] text-left">
@@ -160,7 +160,7 @@ export function OpsDashboardPage() {
 
         {activeTab === "risk" && (
           <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-            <TerminalPanel title="RISK PARAMETERS">
+            <TerminalPanel title="ПАРАМЕТРЫ РИСКА">
               <div className="p-1 space-y-2">
                 <div className="flex justify-between text-[10px] border-b border-terminal-border/20 pb-1">
                   <span>MAX PORTFOLIO VaR</span>

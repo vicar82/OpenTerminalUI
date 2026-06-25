@@ -343,7 +343,7 @@ export function IndicatorPanel({ symbol, activeIndicators, onChange, templateSco
       <input
         value={search}
         onChange={(event) => setSearch(event.target.value)}
-        placeholder="Search indicators, aliases, or categories"
+        placeholder="Поиск индикаторов, псевдонимов или категорий"
         className="mb-2 w-full rounded border border-terminal-border bg-terminal-bg px-2 py-1 text-xs text-terminal-text outline-none focus:border-terminal-accent"
       />
 

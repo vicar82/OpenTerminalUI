@@ -27,7 +27,7 @@ export function SaveScreenDialog() {
   }, [activeScreen]);
 
   return (
-    <TerminalPanel title="Save Screen" subtitle="Persist Current Query" bodyClassName="space-y-2">
+    <TerminalPanel title="Сохранить экран" subtitle="Persist Current Query" bodyClassName="space-y-2">
       {error ? <div className="rounded-sm border border-terminal-neg bg-terminal-neg/10 px-2 py-1 text-xs text-terminal-neg">{error}</div> : null}
       <TerminalInput value={name} onChange={(event) => setName(event.target.value)} placeholder="Name" />
       <TerminalInput value={description} onChange={(event) => setDescription(event.target.value)} placeholder="Description" />

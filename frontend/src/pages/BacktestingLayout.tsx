@@ -15,7 +15,7 @@ function BacktestingRightRail() {
     if (location.pathname.includes("/backtesting/model-lab/experiments/")) return "Model Lab Experiment";
     if (location.pathname.includes("/backtesting/model-lab/runs/")) return "Model Lab Run Report";
     if (location.pathname.includes("/backtesting/model-lab")) return "Model Lab";
-    if (location.pathname.includes("/backtesting/model-governance")) return "Model Governance";
+    if (location.pathname.includes("/backtesting/model-governance")) return "Управление моделями";
     if (location.pathname.includes("/backtesting/algorithm-framework")) return "Algorithm Framework Lab";
     if (location.pathname.includes("/backtesting/portfolio-optimizer")) return "Portfolio Optimizer";
     return "Backtesting Console";

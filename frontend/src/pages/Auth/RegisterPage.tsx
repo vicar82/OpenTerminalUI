@@ -20,15 +20,15 @@ export function RegisterPage() {
     setError(null);
 
     if (!email.includes("@")) {
-      setError("ENTER A VALID EMAIL");
+      setError("ВВЕДИТЕ КОРРЕКТНЫЙ EMAIL");
       return;
     }
     if (password.length < 8) {
-      setError("PASSWORD MUST BE AT LEAST 8 CHARACTERS");
+      setError("ПАРОЛЬ ДОЛЖЕН БЫТЬ НЕ МЕНЕЕ 8 СИМВОЛОВ");
       return;
     }
     if (password !== confirmPassword) {
-      setError("PASSWORDS DO NOT MATCH");
+      setError("ПАРОЛИ НЕ СОВПАДАЮТ");
       return;
     }
 
@@ -37,13 +37,13 @@ export function RegisterPage() {
       await login(email.trim(), password);
       navigate("/equity/stocks", { replace: true });
     } catch {
-      setError("REGISTRATION FAILED");
+      setError("ОШИБКА РЕГИСТРАЦИИ");
     }
   };
 
   return (
     <div className="ot-login-layout">
-      <StatusBar left="OPENTERMINALUI" center="SYSTEM STATUS: ONLINE" centerDotColor="green" />
+      <StatusBar left="OPENTERMINALUI" center="СТАТУС СИСТЕМЫ: ОНЛАЙН" centerDotColor="green" />
 
       <section className="ot-login-hero">
         <div className="ot-login-ticker-wrap">
@@ -61,12 +61,12 @@ export function RegisterPage() {
         <div className="ot-brand-block">
           <div className="ot-brand-logo-row">
             <img src={logo} alt="OpenTerminalUI" className="ot-brand-logo" />
-            <span className="ot-brand-kicker">OPEN-SOURCE TRADING TERMINAL</span>
+            <span className="ot-brand-kicker">ТОРГОВЫЙ ТЕРМИНАЛ С ОТКРЫТЫМ КОДОМ</span>
           </div>
           <h1 className="ot-brand-title">
             <span className="ot-brand-title-open">OPENTERMINALUI</span>
           </h1>
-          <p className="ot-brand-subtitle">Create secure terminal access.</p>
+          <p className="ot-brand-subtitle">Создайте безопасный доступ к терминалу.</p>
         </div>
       </section>
 
@@ -76,9 +76,9 @@ export function RegisterPage() {
             <div className="ot-panel-logo-wrap">
               <img src={logo} alt="OpenTerminalUI logo" className="ot-panel-logo" />
             </div>
-            <p className="ot-panel-kicker">NEW OPERATOR</p>
-            <h2 className="ot-panel-title">REQUEST ACCESS</h2>
-            <p className="ot-panel-subtitle">Provision your terminal credentials</p>
+            <p className="ot-panel-kicker">НОВЫЙ ОПЕРАТОР</p>
+            <h2 className="ot-panel-title">ЗАПРОС ДОСТУПА</h2>
+            <p className="ot-panel-subtitle">Создание учётных данных терминала</p>
             <span className="ot-panel-divider" />
           </header>
 
@@ -91,7 +91,7 @@ export function RegisterPage() {
               <input
                 id="ot-register-email"
                 className="ot-input"
-                placeholder="Enter email..."
+                placeholder="Введите email..."
                 value={email}
                 onChange={(event) => setEmail(event.target.value)}
                 autoComplete="username"
@@ -100,7 +100,7 @@ export function RegisterPage() {
             </div>
 
             <label className="ot-field-label ot-stagger" style={{ ["--stagger-index" as string]: 4 }} htmlFor="ot-register-password">
-              PASSWORD
+              ПАРОЛЬ
             </label>
             <div className="ot-input-wrap ot-stagger" style={{ ["--stagger-index" as string]: 5 }}>
               <span className="ot-input-prompt">&gt;</span>
@@ -108,7 +108,7 @@ export function RegisterPage() {
                 id="ot-register-password"
                 className="ot-input"
                 type="password"
-                placeholder="Create password..."
+                placeholder="Придумайте пароль..."
                 value={password}
                 onChange={(event) => setPassword(event.target.value)}
                 autoComplete="new-password"
@@ -117,7 +117,7 @@ export function RegisterPage() {
             </div>
 
             <label className="ot-field-label ot-stagger" style={{ ["--stagger-index" as string]: 6 }} htmlFor="ot-register-confirm-password">
-              CONFIRM PASSWORD
+              ПОДТВЕРДИТЕ ПАРОЛЬ
             </label>
             <div className="ot-input-wrap ot-stagger" style={{ ["--stagger-index" as string]: 7 }}>
               <span className="ot-input-prompt">&gt;</span>
@@ -125,7 +125,7 @@ export function RegisterPage() {
                 id="ot-register-confirm-password"
                 className="ot-input"
                 type="password"
-                placeholder="Confirm password..."
+                placeholder="Подтвердите пароль..."
                 value={confirmPassword}
                 onChange={(event) => setConfirmPassword(event.target.value)}
                 autoComplete="new-password"
@@ -134,7 +134,7 @@ export function RegisterPage() {
             </div>
 
             <label className="ot-field-label ot-stagger" style={{ ["--stagger-index" as string]: 8 }} htmlFor="ot-register-role">
-              ROLE
+              РОЛЬ
             </label>
             <div className="ot-input-wrap ot-stagger" style={{ ["--stagger-index" as string]: 9 }}>
               <span className="ot-input-prompt">&gt;</span>
@@ -145,21 +145,21 @@ export function RegisterPage() {
                 onChange={(event) => setRole(event.target.value as AuthRole)}
                 disabled={isLoading}
               >
-                <option value="viewer">VIEWER</option>
-                <option value="trader">TRADER</option>
-                <option value="admin">ADMIN</option>
+                <option value="viewer">НАБЛЮДАТЕЛЬ</option>
+                <option value="trader">ТРЕЙДЕР</option>
+                <option value="admin">АДМИН</option>
               </select>
             </div>
 
             <button type="submit" className="ot-login-submit ot-stagger" style={{ ["--stagger-index" as string]: 10 }} disabled={isLoading}>
-              {isLoading ? "CREATING ACCOUNT..." : "CREATE ACCOUNT"}
+              {isLoading ? "СОЗДАНИЕ АККАУНТА..." : "СОЗДАТЬ АККАУНТ"}
             </button>
 
             {error ? <p className="ot-auth-error">{error}</p> : null}
 
             <footer className="ot-login-footer ot-stagger" style={{ ["--stagger-index" as string]: 11 }}>
               <p>
-                Already registered? <Link to="/login">Access terminal</Link>
+                Уже зарегистрированы? <Link to="/login">Войти в терминал</Link>
               </p>
             </footer>
           </form>

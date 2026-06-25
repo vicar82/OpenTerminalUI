@@ -381,7 +381,7 @@ export function PortfolioOptimizer() {
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 {/* Optimal Allocation */}
-                <TerminalPanel title="Optimal Allocation" subtitle="Portfolio Weights">
+                <TerminalPanel title="Optimal Allocation" subtitle="Веса портфеля">
                   <div className="space-y-2 p-1 overflow-auto max-h-[300px]">
                     {Object.entries(result.weights)
                       .filter(([_, w]) => w > 0.0001)

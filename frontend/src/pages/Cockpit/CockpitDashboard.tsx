@@ -777,7 +777,7 @@ export function CockpitDashboard() {
         {portfolioSymbols.length > 0 && (
           <div className="grid grid-cols-1">
             <AiInsightCard
-              title="AI Portfolio Briefing"
+              title="ИИ-брифинг портфеля"
               description={`Gemma-powered analysis of themes and posture for ${portfolioSymbols.length} active holdings`}
               fetcher={() => fetchCollectionBriefing(portfolioSymbols, "portfolio")}
             />
@@ -799,7 +799,7 @@ export function CockpitDashboard() {
             context={sentimentQuery.data ? `${sentimentQuery.data.total_articles} articles in scope` : "Intraday move"}
             tone={changePct != null && changePct < 0 ? "text-terminal-neg" : "text-terminal-pos"}
           />
-          <MetricCard label="Portfolio Value" value={fmtCurrency(portfolioValue, currency, 0)} context={`${portfolio.items.length} holdings on desk`} />
+          <MetricCard label="Стоимость портфеля" value={fmtCurrency(portfolioValue, currency, 0)} context={`${portfolio.items.length} holdings on desk`} />
           <MetricCard
             label="Day PnL"
             value={fmtSignedCurrency(dailyPnl, currency, 0)}
@@ -807,7 +807,7 @@ export function CockpitDashboard() {
             tone={dailyPnl != null && dailyPnl < 0 ? "text-terminal-neg" : "text-terminal-pos"}
           />
           <MetricCard
-            label="Desk Risk"
+            label="Риск рабочего места"
             value={focusVar95 != null ? `${fmtNumber(focusVar95, 2)} VaR95` : fmtNumber(focusBeta, 2)}
             context={activeJobs != null ? `${fmtNumber(activeJobs, 0)} active jobs` : "Risk snapshot"}
             tone="text-terminal-warn"
@@ -866,7 +866,7 @@ export function CockpitDashboard() {
               <div className="grid gap-2 sm:grid-cols-2 xl:grid-cols-4">
                 <MetricCard label="52W Low" value={fmtCurrency(week52Low, currency, 2)} />
                 <MetricCard label="52W High" value={fmtCurrency(week52High, currency, 2)} />
-                <MetricCard label="Open" value={fmtCurrency(dayOpen, currency, 2)} />
+                <MetricCard label="Открыть" value={fmtCurrency(dayOpen, currency, 2)} />
                 <MetricCard label="Day Range" value={`${fmtCurrency(dayLow, currency, 2)} / ${fmtCurrency(dayHigh, currency, 2)}`} />
               </div>
               <FocusChart ticker={focusTicker} points={chartPoints} />
@@ -878,9 +878,9 @@ export function CockpitDashboard() {
                     {analyst.target_price != null ? <TerminalBadge variant="accent">Target {fmtCurrency(analyst.target_price, currency, 2)}</TerminalBadge> : null}
                   </div>
                   <div className="space-y-2">
-                    <SignalMeter label="Buy" value={buyPct} tone="positive" />
+                    <SignalMeter label="Купить" value={buyPct} tone="positive" />
                     <SignalMeter label="Hold" value={holdPct} tone="accent" />
-                    <SignalMeter label="Sell" value={sellPct} tone="negative" />
+                    <SignalMeter label="Продать" value={sellPct} tone="negative" />
                   </div>
                 </div>
                 <div className="rounded-sm border border-terminal-border bg-terminal-bg p-3">
@@ -1033,7 +1033,7 @@ export function CockpitDashboard() {
           </div>
 
           <div className="grid gap-2">
-            {showPanel("portfolio") ? <TerminalPanel title="Portfolio Monitor" subtitle="Largest active holdings" bodyClassName="space-y-2">
+            {showPanel("portfolio") ? <TerminalPanel title="Монитор портфеля" subtitle="Largest active holdings" bodyClassName="space-y-2">
               <div className="rounded-sm border border-terminal-border bg-terminal-bg">
                 <table className="min-w-full text-xs">
                   <thead>
@@ -1069,7 +1069,7 @@ export function CockpitDashboard() {
               </div>
             </TerminalPanel> : null}
 
-            {showPanel("risk") ? <TerminalPanel title="Risk Monitor" subtitle="Ticker and portfolio overlay" bodyClassName="space-y-3">
+            {showPanel("risk") ? <TerminalPanel title="Монитор риска" subtitle="Ticker and portfolio overlay" bodyClassName="space-y-3">
               <div className="grid gap-2 sm:grid-cols-2">
                 <MetricCard label="Focus Beta" value={fmtNumber(focusBeta, 2)} />
                 <MetricCard label="VaR 95" value={fmtNumber(focusVar95, 2)} />

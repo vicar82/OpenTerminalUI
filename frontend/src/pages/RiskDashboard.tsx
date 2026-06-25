@@ -233,7 +233,7 @@ export function RiskDashboardPage() {
     running += alpha;
     rows.push({
       key: "alpha",
-      label: "Alpha",
+      label: "Альфа",
       offset: Math.min(alphaStart, running),
       contribution: Math.abs(alpha),
       signedContribution: alpha,
@@ -348,7 +348,7 @@ export function RiskDashboardPage() {
       {tab === "overview" ? (
         <>
           <AiInsightCard
-            title="AI Risk Insights"
+            title="ИИ-инсайты по рискам"
             description={`${mode === "ticker" ? storeTicker : "Portfolio"} · Gemma reading of volatility, concentration, and correlation`}
             fetcher={() =>
               fetchRiskInsights(mode === "ticker" ? `${storeTicker} and peers` : "the portfolio", {
@@ -359,7 +359,7 @@ export function RiskDashboardPage() {
             }
           />
           <div className="grid grid-cols-1 gap-3 lg:grid-cols-3">
-            <TerminalPanel title="STATISTICAL RISK METRICS" subtitle={mode === "ticker" ? `Analysis for ${storeTicker} + Peers` : "Total Portfolio Attribution"}>
+            <TerminalPanel title="СТАТИСТИЧЕСКИЕ МЕТРИКИ РИСКА" subtitle={mode === "ticker" ? `Analysis for ${storeTicker} + Peers` : "Total Portfolio Attribution"}>
               <div className="space-y-4 p-1 text-xs">
                 <div className="grid grid-cols-2 gap-2">
                   <div className="rounded border border-terminal-border/50 bg-terminal-bg p-2">
@@ -409,7 +409,7 @@ export function RiskDashboardPage() {
               </div>
             </TerminalPanel>
 
-            <TerminalPanel title="EXPOSURE CLUSTERING" subtitle={mode === "ticker" ? "Regional/Industry Breakdown" : "Sector Concentration (%)"}>
+            <TerminalPanel title="КЛАСТЕРИЗАЦИЯ ЭКСПОЗИЦИИ" subtitle={mode === "ticker" ? "Regional/Industry Breakdown" : "Sector Concentration (%)"}>
               <div className="h-64 w-full">
                 <ResponsiveContainer width="100%" height="100%">
                   <PieChart>
@@ -438,7 +438,7 @@ export function RiskDashboardPage() {
           </div>
 
           <ExposureHeatmap
-            title="Risk Exposure Heatmap"
+            title="Тепловая карта риск-экспозиции"
             market={mode === "ticker" ? storeTicker : "PORTFOLIO"}
             items={heatmapItems}
             factorExposures={factorExposures}
@@ -446,7 +446,7 @@ export function RiskDashboardPage() {
             defaultMode={correlation?.assets?.length ? "correlation" : "sector"}
           />
 
-          <TerminalPanel title="CORRELATION DYNAMICS" subtitle="Rolling pairwise correlation matrix (60D window)">
+          <TerminalPanel title="ДИНАМИКА КОРРЕЛЯЦИЙ" subtitle="Rolling pairwise correlation matrix (60D window)">
             <div className="overflow-x-auto p-1">
               <table className="w-full border-collapse text-right text-[10px]">
                 <thead>
@@ -483,7 +483,7 @@ export function RiskDashboardPage() {
       {tab === "factors" ? (
         <div className="space-y-3">
           <div className="grid grid-cols-1 gap-3 xl:grid-cols-3">
-            <TerminalPanel title="FACTOR EXPOSURES" subtitle={`Portfolio factor loadings (${factorPeriod})`} className="xl:col-span-2">
+            <TerminalPanel title="ФАКТОРНЫЕ ЭКСПОЗИЦИИ" subtitle={`Portfolio factor loadings (${factorPeriod})`} className="xl:col-span-2">
               <div className="h-80 w-full" data-testid="factor-exposure-chart">
                 <ResponsiveContainer width="100%" height="100%">
                   <BarChart data={factorExposureData} layout="vertical" margin={{ top: 12, right: 24, left: 12, bottom: 12 }}>
@@ -510,7 +510,7 @@ export function RiskDashboardPage() {
               </div>
             </TerminalPanel>
 
-            <TerminalPanel title="STYLE BOX" subtitle="Size vs value positioning">
+            <TerminalPanel title="СТИЛЬ-БОКС" subtitle="Size vs value positioning">
               <div className="space-y-3">
                 <div className="grid grid-cols-3 gap-2 text-center text-[10px]" data-testid="factor-style-box">
                   {["Small", "Mid", "Large"].map((row) =>
@@ -540,7 +540,7 @@ export function RiskDashboardPage() {
           </div>
 
           <div className="grid grid-cols-1 gap-3 xl:grid-cols-5">
-            <TerminalPanel title="RETURN ATTRIBUTION" subtitle="Waterfall decomposition of realized return" className="xl:col-span-3">
+            <TerminalPanel title="АТТРИБУЦИЯ ДОХОДНОСТИ" subtitle="Waterfall decomposition of realized return" className="xl:col-span-3">
               <div className="h-80 w-full" data-testid="factor-waterfall-chart">
                 <ResponsiveContainer width="100%" height="100%">
                   <ComposedChart data={waterfallData} margin={{ top: 12, right: 24, left: 8, bottom: 12 }}>
@@ -596,7 +596,7 @@ export function RiskDashboardPage() {
             </TerminalPanel>
           </div>
 
-          <TerminalPanel title="ROLLING FACTOR EXPOSURES" subtitle="60-day rolling portfolio betas">
+          <TerminalPanel title="СКОЛЬЗЯЩИЕ ФАКТОРНЫЕ ЭКСПОЗИЦИИ" subtitle="60-day rolling portfolio betas">
             <div className="h-96 w-full" data-testid="factor-history-chart">
               <ResponsiveContainer width="100%" height="100%">
                 <LineChart data={factorHistoryData} margin={{ top: 12, right: 24, left: 8, bottom: 12 }}>

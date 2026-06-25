@@ -8,49 +8,49 @@ export function Sidebar() {
   const ticker = useStockStore((s) => s.ticker);
   const unreadCount = useAlertsStore((s) => s.unreadCount);
   const nav = [
-    { label: "Market", path: "/equity/stocks", key: "F1" },
-    { label: "Security Hub", path: "/equity/security", key: "SH", hint: "Research" },
-    { label: "Economics", path: "/equity/economics", key: "E", hint: "Macro" },
-    { label: "Commodities", path: "/equity/commodities", key: "CMDTY", hint: "Macro" },
-    { label: "Forex", path: "/equity/forex", key: "FX", hint: "Macro" },
-    { label: "ETF Analytics", path: "/equity/etf-analytics", key: "ETFA", hint: "Funds" },
-    { label: "Bonds", path: "/equity/bonds", key: "BOND", hint: "Fixed Income" },
-    { label: "Yield Curve", path: "/equity/yield-curve", key: "YC", hint: "Fixed Income" },
-    { label: "Rotation", path: "/equity/sector-rotation", key: "ROT", hint: "Relative" },
-    { label: "Crypto", path: "/equity/crypto", key: "CR", hint: "Digital" },
-    { label: "Compare", path: "/equity/compare", key: "CMP", hint: "Split View" },
-    { label: "Screener", path: "/equity/screener", key: "F2" },
-    { label: "Hotlists", path: "/equity/hotlists", key: "HOT", hint: "Movers" },
-    { label: "Insider", path: "/equity/insider", key: "IN", hint: "Research" },
-    { label: "Heatmap", path: "/equity/heatmap", key: "HM", hint: "Market" },
-    { label: "Dividends", path: "/equity/dividends", key: "DIV", hint: "Income" },
-    { label: "RS Analysis", path: "/equity/rs", key: "RS", hint: "Relative" },
-    { label: "Launchpad", path: "/equity/launchpad", key: "LP", hint: "Workspace" },
-    { label: "Workstation", path: "/equity/chart-workstation", key: "6", hint: "6 Charts" },
-    { label: "Research", path: "/equity/research", key: "RES", hint: "Papers" },
-    { label: "MTA", path: "/equity/mta", key: "MT", hint: "Multi-TF" },
-    { label: "DOM", path: "/equity/dom", key: "D", hint: "Depth" },
-    { label: "Tape", path: "/equity/tape", key: "T", hint: "Time & Sales" },
-    { label: "Portfolio", path: "/equity/portfolio", key: "F3" },
-    { label: "Portfolio Lab", path: "/equity/portfolio/lab", key: "PLB", hint: "Research" },
-    { label: "Paper", path: "/equity/paper", key: "P" },
-    { label: "Position Sizer", path: "/equity/position-sizer", key: "PS", hint: "Trading" },
-    { label: "Journal", path: "/equity/journal", key: "J", hint: "Trading" },
-    { label: "Watchlist", path: "/equity/watchlist", key: "F4" },
-    { label: "News", path: "/equity/news", key: "F5" },
-    { label: "Alerts", path: "/equity/alerts", key: "A" },
-    { label: "Risk", path: "/equity/risk", key: "R" },
-    { label: "Correlation", path: "/equity/correlation", key: "CR", hint: "Risk" },
-    { label: "Stat Lab", path: "/equity/stat-lab", key: "SL", hint: "Quant" },
-    { label: "Pair Trading", path: "/equity/pair-trading", key: "PT", hint: "Quant" },
-    { label: "OMS", path: "/equity/oms", key: "O" },
-    { label: "Ops", path: "/equity/ops", key: "K" },
-    { label: "Plugins", path: "/equity/plugins", key: "PL" },
-    { label: "Settings", path: "/equity/settings", key: "F6" },
-    { label: "About", path: "/equity/stocks/about", key: "F7" },
-    { label: "Model Lab", path: "/backtesting/model-lab", key: "ML", hint: "Backtest" },
-    { label: "Cockpit", path: "/equity/cockpit", key: "CP", hint: "Overview" },
-    { label: "Backtesting", path: "/backtesting", key: "F9" },
+    { label: "Рынок", path: "/equity/stocks", key: "F1" },
+    { label: "Карточка актива", path: "/equity/security", key: "SH", hint: "Исследования" },
+    { label: "Экономика", path: "/equity/economics", key: "E", hint: "Macro" },
+    { label: "Товары", path: "/equity/commodities", key: "CMDTY", hint: "Macro" },
+    { label: "Форекс", path: "/equity/forex", key: "FX", hint: "Macro" },
+    { label: "ETF-аналитика", path: "/equity/etf-analytics", key: "ETFA", hint: "Funds" },
+    { label: "Облигации", path: "/equity/bonds", key: "BOND", hint: "Fixed Income" },
+    { label: "Доходная кривая", path: "/equity/yield-curve", key: "YC", hint: "Fixed Income" },
+    { label: "Ротация секторов", path: "/equity/sector-rotation", key: "ROT", hint: "Relative" },
+    { label: "Крипто", path: "/equity/crypto", key: "CR", hint: "Digital" },
+    { label: "Сравнение", path: "/equity/compare", key: "CMP", hint: "Split View" },
+    { label: "Скринер", path: "/equity/screener", key: "F2" },
+    { label: "Лидеры", path: "/equity/hotlists", key: "HOT", hint: "Movers" },
+    { label: "Инсайдеры", path: "/equity/insider", key: "IN", hint: "Исследования" },
+    { label: "Тепловая карта", path: "/equity/heatmap", key: "HM", hint: "Рынок" },
+    { label: "Дивиденды", path: "/equity/dividends", key: "DIV", hint: "Income" },
+    { label: "Отн. сила", path: "/equity/rs", key: "RS", hint: "Relative" },
+    { label: "Панель запуска", path: "/equity/launchpad", key: "LP", hint: "Workspace" },
+    { label: "Рабочая станция", path: "/equity/chart-workstation", key: "6", hint: "6 Charts" },
+    { label: "Исследования", path: "/equity/research", key: "RES", hint: "Papers" },
+    { label: "Мульти-ТФ", path: "/equity/mta", key: "MT", hint: "Multi-TF" },
+    { label: "Стакан", path: "/equity/dom", key: "D", hint: "Depth" },
+    { label: "Лента", path: "/equity/tape", key: "T", hint: "Time & Sales" },
+    { label: "Портфель", path: "/equity/portfolio", key: "F3" },
+    { label: "Лаб. портфеля", path: "/equity/portfolio/lab", key: "PLB", hint: "Исследования" },
+    { label: "Бумажная торговля", path: "/equity/paper", key: "P" },
+    { label: "Кальк. позиции", path: "/equity/position-sizer", key: "PS", hint: "Trading" },
+    { label: "Журнал", path: "/equity/journal", key: "J", hint: "Trading" },
+    { label: "Наблюдение", path: "/equity/watchlist", key: "F4" },
+    { label: "Новости", path: "/equity/news", key: "F5" },
+    { label: "Алерты", path: "/equity/alerts", key: "A" },
+    { label: "Риск", path: "/equity/risk", key: "R" },
+    { label: "Корреляция", path: "/equity/correlation", key: "CR", hint: "Риски" },
+    { label: "Стат. лаборатория", path: "/equity/stat-lab", key: "SL", hint: "Quant" },
+    { label: "Парный трейдинг", path: "/equity/pair-trading", key: "PT", hint: "Quant" },
+    { label: "Ордер-менеджмент", path: "/equity/oms", key: "O" },
+    { label: "Операции", path: "/equity/ops", key: "K" },
+    { label: "Плагины", path: "/equity/plugins", key: "PL" },
+    { label: "Настройки", path: "/equity/settings", key: "F6" },
+    { label: "О программе", path: "/equity/stocks/about", key: "F7" },
+    { label: "Модельная лаборатория", path: "/backtesting/model-lab", key: "ML", hint: "Backtest" },
+    { label: "Кокпит", path: "/equity/cockpit", key: "CP", hint: "Overview" },
+    { label: "Бэктестинг", path: "/backtesting", key: "F9" },
   ];
 
   return (
@@ -59,17 +59,17 @@ export function Sidebar() {
         <img src={logo} alt="OpenTerminalUI" className="h-8 w-auto object-contain" />
       </div>
       <div className="border-b border-terminal-border px-3 py-2 text-[11px] text-terminal-muted">
-        NSE EQUITY ANALYTICS
+        NSE АНАЛИТИКА АКЦИЙ
       </div>
       <div className="space-y-1 border-b border-terminal-border p-2 text-xs">
         <NavLink to="/" className="block rounded px-2 py-2 text-terminal-muted hover:bg-terminal-bg hover:text-terminal-text">
-          Home
+          Главная
         </NavLink>
         <NavLink
           to={`/fno?symbol=${encodeURIComponent((ticker || "NIFTY").toUpperCase())}`}
           className="block rounded px-2 py-2 text-terminal-muted hover:bg-terminal-bg hover:text-terminal-text"
         >
-          Switch To F&O {"->"}
+          Переключиться в F&O {"->"}
         </NavLink>
       </div>
       <nav className="flex-1 space-y-1 overflow-auto p-2 text-xs">

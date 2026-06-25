@@ -22,15 +22,15 @@ export function ForgotAccessPage() {
     setMessage(null);
 
     if (!email.includes("@")) {
-      setError("Enter a valid email");
+      setError("Введите корректный email");
       return;
     }
     if (newPassword.length < 8) {
-      setError("Password must be at least 8 characters");
+      setError("Пароль должен быть не менее 8 символов");
       return;
     }
     if (newPassword !== confirmPassword) {
-      setError("Passwords do not match");
+      setError("Пароли не совпадают");
       return;
     }
 
@@ -40,10 +40,10 @@ export function ForgotAccessPage() {
         email: email.trim(),
         new_password: newPassword,
       });
-      setMessage("Access updated. You can now sign in with your new password.");
+      setMessage("Доступ обновлён. Теперь можно войти с новым паролем.");
       window.setTimeout(() => navigate("/login", { replace: true }), 900);
     } catch {
-      setError("Could not reset access. Try again.");
+      setError("Не удалось сбросить доступ. Попробуйте снова.");
     } finally {
       setIsSubmitting(false);
     }
@@ -51,7 +51,7 @@ export function ForgotAccessPage() {
 
   return (
     <div className="mx-auto mt-16 max-w-md rounded border border-terminal-border bg-terminal-panel p-5">
-      <h1 className="mb-4 text-lg font-semibold text-terminal-accent">Forgot access</h1>
+      <h1 className="mb-4 text-lg font-semibold text-terminal-accent">Восстановление доступа</h1>
       <form className="space-y-3" onSubmit={onSubmit}>
         <input
           className="w-full rounded border border-terminal-border bg-terminal-bg px-3 py-2 text-sm"
@@ -62,7 +62,7 @@ export function ForgotAccessPage() {
         />
         <input
           className="w-full rounded border border-terminal-border bg-terminal-bg px-3 py-2 text-sm"
-          placeholder="New password"
+          placeholder="Новый пароль"
           type="password"
           value={newPassword}
           onChange={(e) => setNewPassword(e.target.value)}
@@ -70,7 +70,7 @@ export function ForgotAccessPage() {
         />
         <input
           className="w-full rounded border border-terminal-border bg-terminal-bg px-3 py-2 text-sm"
-          placeholder="Confirm new password"
+          placeholder="Подтвердите новый пароль"
           type="password"
           value={confirmPassword}
           onChange={(e) => setConfirmPassword(e.target.value)}
@@ -82,11 +82,11 @@ export function ForgotAccessPage() {
           disabled={isSubmitting}
           className="w-full rounded border border-terminal-accent px-3 py-2 text-sm text-terminal-accent disabled:opacity-60"
         >
-          {isSubmitting ? "Updating access..." : "Reset access"}
+          {isSubmitting ? "Обновление доступа..." : "Сбросить доступ"}
         </button>
       </form>
       <div className="mt-3 text-xs text-terminal-muted">
-        Back to <Link className="text-terminal-accent underline" to="/login">Login</Link>
+        Назад к <Link className="text-terminal-accent underline" to="/login">входу</Link>
       </div>
     </div>
   );

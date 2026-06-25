@@ -72,7 +72,7 @@ export function PortfolioMiniChart({
   height = 196,
   className = "",
   ariaLabel = "Portfolio performance chart",
-  emptyLabel = "No portfolio performance data available",
+  emptyLabel = "Нет данных по доходности портфеля",
   valueFormatter = formatDefaultValue,
 }: PortfolioMiniChartProps) {
   const gradientId = useId().replace(/:/g, "");
