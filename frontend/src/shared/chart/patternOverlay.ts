@@ -191,7 +191,7 @@ export async function fetchPatternDetections(
   params.set("timeframe", options.timeframe || "1D");
   params.set("min_confidence", String(options.minConfidence ?? 0.6));
   params.set("lookback", String(options.lookback ?? 200));
-  params.set("market", options.market || "NSE");
+  params.set("market", options.market || "MOEX");
 
   const response = await fetch(`${base}/charts/${encodeURIComponent(symbol)}/patterns?${params.toString()}`, {
     signal: options.signal,

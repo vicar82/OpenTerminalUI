@@ -34,7 +34,7 @@ const DEPTH_OPTIONS = [10, 20, 40] as const;
 
 function normalizeMarket(value: string): string {
   const market = String(value || "").trim().toUpperCase();
-  if (market === "NSE" || market === "BSE" || market === "IN") return "IN";
+  if (market === "MOEX" || market === "MOEX" || market === "RU") return "RU";
   if (market === "CRYPTO" || market === "BINANCE") return "CRYPTO";
   return "US";
 }

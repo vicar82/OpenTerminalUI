@@ -15,7 +15,7 @@ export type LiveClockStripProps = {
 };
 
 const DEFAULT_ZONES: readonly LiveClockZone[] = [
-  { id: "ist", label: "IST", timeZone: "Asia/Kolkata" },
+  { id: "ist", label: "IST", timeZone: "Europe/Moscow" },
   { id: "est", label: "EST", timeZone: "America/New_York" },
   { id: "utc", label: "UTC", timeZone: "UTC" },
 ];

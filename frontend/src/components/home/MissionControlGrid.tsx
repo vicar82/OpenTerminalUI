@@ -13,9 +13,9 @@ type MarketCell = {
 };
 
 const MARKET_CELLS: MarketCell[] = [
-  { key: "nifty", label: "NIFTY 50", token: "NIFTY" },
-  { key: "banknifty", label: "BANK NIFTY", token: "BANKNIFTY" },
-  { key: "vix", label: "INDIA VIX", token: "INDIAVIX" },
+  { key: "nifty", label: "NIFTY 50", token: "IMOEX" },
+  { key: "banknifty", label: "BANK NIFTY", token: "MOEX10" },
+  { key: "vix", label: "INDIA VIX", token: "RUVIX" },
 ];
 
 function formatNum(value: number | null | undefined, digits = 2): string {

@@ -13,7 +13,7 @@ vi.mock("../hooks/useStocks", () => ({
 
 vi.mock("../store/settingsStore", () => ({
   useSettingsStore: (selector: (state: { selectedMarket: string }) => unknown) =>
-    selector({ selectedMarket: "NSE" }),
+    selector({ selectedMarket: "MOEX" }),
 }));
 
 vi.mock("../realtime/useQuotesStream", () => ({
@@ -47,9 +47,9 @@ describe("MissionControlGrid", () => {
     expect(screen.getByText("22,400.50")).toBeInTheDocument();
     expect(screen.getByText("+0.83%")).toBeInTheDocument();
 
-    expect(subscribeSpy).toHaveBeenCalledWith(["NIFTY", "BANKNIFTY", "INDIAVIX"]);
+    expect(subscribeSpy).toHaveBeenCalledWith(["IMOEX", "MOEX10", "RUVIX"]);
 
     unmount();
-    expect(unsubscribeSpy).toHaveBeenCalledWith(["NIFTY", "BANKNIFTY", "INDIAVIX"]);
+    expect(unsubscribeSpy).toHaveBeenCalledWith(["IMOEX", "MOEX10", "RUVIX"]);
   });
 });

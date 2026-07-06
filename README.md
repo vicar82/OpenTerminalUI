@@ -25,6 +25,8 @@
 - **Удалён Docker** — больше нет `Dockerfile`, `docker-compose.yml` и `.dockerignore`.
 - **Добавлен нормальный установщик для Debian/Ubuntu** — ставит приложение в `/opt/openterminalui`, настраивает пользователя, данные и `systemd`-сервис.
 - **Локальные установщики** (`install.sh` / `install.ps1`) больше не используют Docker и сразу запускают сервер на `http://localhost:8000`.
+- **Заменён индийский рынок (NSE/BSE) на российский (MOEX)** — индексы IMOEX/RTSI, акции российских эмитентов через API Московской биржи.
+- **Добавлена поддержка self-hosted Ollama** — локальная LLM по умолчанию работает через `http://localhost:11434/v1/chat/completions`, без внешних API-ключей.
 
 ---
 
@@ -98,6 +100,39 @@ cd OpenTerminalUI
 
 ---
 
+## Поддерживаемые рынки
+
+| Рынок | Источник данных | Примечания |
+|-------|-----------------|------------|
+| Россия (MOEX) | [MOEX ISS API](https://www.moex.com/a2193) | Акции Т+2 (`TQBR`), индексы IMOEX и RTSI, исторические свечи |
+| США (NYSE/NASDAQ) | Yahoo Finance / Finnhub / FMP | Акции, ETF, фьючерсы, фундаментальные данные |
+
+Индийский рынок (NSE/BSE) и интеграция Zerodha Kite удалены.
+
+---
+
+## Self-hosted Ollama
+
+По умолчанию AI-агент и эмоциональный анализ новостей работают через локальную Ollama:
+
+```bash
+ollama run llama3
+```
+
+Переменные окружения (заполняются автоматически установщиком):
+
+```dotenv
+AI_PROVIDER=ollama
+AGENT_PROVIDER=ollama
+AGENT_MODEL=llama3
+OLLAMA_HOST=http://localhost:11434
+OLLAMA_MODEL=llama3
+```
+
+Если Ollama не запущена, приложение продолжит работу с резервными данными.
+
+---
+
 ## Переменные окружения
 
 Ключи API необязательны — платформа работает на встроенных резервных данных. Добавьте ключи, чтобы разблокировать полный доступ к данным:
@@ -106,9 +141,10 @@ cd OpenTerminalUI
 |------------|------------|
 | `FMP_API_KEY` | Financial Modeling Prep — акции США, фундаментал, отчётность |
 | `FINNHUB_API_KEY` | Finnhub — WebSocket-тики США в реальном времени |
-| `KITE_API_KEY` / `KITE_API_SECRET` / `KITE_ACCESS_TOKEN` | Zerodha Kite — Индия NSE/BSE |
 | `OPENROUTER_API_KEY` | OpenRouter — встроенный агент и эмоциональный анализ новостей |
 | `OPENAI_API_KEY` | OpenAI — альтернативный провайдер LLM |
+| `OLLAMA_HOST` | Self-hosted Ollama — адрес API, по умолчанию `http://localhost:11434` |
+| `OLLAMA_MODEL` | Модель Ollama, по умолчанию `llama3` |
 | `JWT_SECRET_KEY` | Подпись JWT (генерируется установщиком) |
 | `CACHE_SIGNING_KEY` | Подпись кэша (генерируется установщиком) |
 

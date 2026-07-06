@@ -53,15 +53,15 @@ vi.mock("../store/settingsStore", () => ({
   useSettingsStore: (
     selector: (state: {
       selectedMarket: string;
-      displayCurrency: "INR" | "USD";
+      displayCurrency: "RUB" | "USD";
       realtimeMode: "polling" | "ws";
       newsAutoRefresh: boolean;
       newsRefreshSec: number;
     }) => unknown,
   ) =>
     selector({
-      selectedMarket: "NSE",
-      displayCurrency: "INR",
+      selectedMarket: "MOEX",
+      displayCurrency: "RUB",
       realtimeMode: "polling",
       newsAutoRefresh: true,
       newsRefreshSec: 60,
@@ -158,10 +158,10 @@ describe("HomePage mission-control revamp", () => {
     ] as any);
 
     vi.mocked(fetchQuotesBatch).mockResolvedValue({
-      market: "NSE",
+      market: "MOEX",
       quotes: [
-        { symbol: "^NSEI", last: 22450.25, change: 145.1, changePct: 0.65, ts: "2026-03-11T12:00:00.000Z" },
-        { symbol: "^BSESN", last: 73900.12, change: -120.2, changePct: -0.16, ts: "2026-03-11T12:00:00.000Z" },
+        { symbol: "IMOEX", last: 22450.25, change: 145.1, changePct: 0.65, ts: "2026-03-11T12:00:00.000Z" },
+        { symbol: "RTSI", last: 73900.12, change: -120.2, changePct: -0.16, ts: "2026-03-11T12:00:00.000Z" },
         { symbol: "^IXIC", last: 18340.22, change: 88.4, changePct: 0.48, ts: "2026-03-11T12:00:00.000Z" },
       ],
     });
@@ -180,12 +180,12 @@ describe("HomePage mission-control revamp", () => {
       expect(fetchPortfolio).toHaveBeenCalledTimes(1);
       expect(fetchWatchlist).toHaveBeenCalledTimes(1);
       expect(fetchBacktestV1Presets).toHaveBeenCalledTimes(1);
-      expect(fetchChainSummary).toHaveBeenCalledWith("NIFTY");
+      expect(fetchChainSummary).toHaveBeenCalledWith("IMOEX");
       expect(fetchPortfolioBenchmarkOverlay).toHaveBeenCalledTimes(1);
       expect(fetchLatestNews).toHaveBeenCalledWith(15);
       expect(fetchQuotesBatch).toHaveBeenCalledWith(
-        ["^NSEI", "^BSESN", "^IXIC", "^GSPC", "GC=F", "SI=F", "CL=F"],
-        "NSE",
+        ["IMOEX", "RTSI", "^IXIC", "^GSPC", "GC=F", "SI=F", "CL=F"],
+        "MOEX",
       );
     });
 

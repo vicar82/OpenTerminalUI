@@ -135,7 +135,7 @@ export function WatchlistManager() {
     const timer = setTimeout(async () => {
       setIsSearching(true);
       try {
-        const results = await searchSymbols(searchQuery, selectedMarket === "NASDAQ" ? "NASDAQ" : "NSE");
+        const results = await searchSymbols(searchQuery, selectedMarket === "NASDAQ" ? "NASDAQ" : "MOEX");
         setTickerResults(results.slice(0, 10));
       } finally {
         setIsSearching(false);

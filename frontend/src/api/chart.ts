@@ -50,7 +50,7 @@ export async function fetchVolumeProfile(
     params: {
       period: opts?.period ?? "20d",
       bins: opts?.bins ?? 50,
-      market: opts?.market ?? "NSE",
+      market: opts?.market ?? "MOEX",
       mode: opts?.mode ?? "fixed",
       lookback_bars: opts?.lookbackBars ?? 300,
     },

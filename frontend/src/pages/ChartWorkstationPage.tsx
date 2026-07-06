@@ -146,7 +146,7 @@ type WorkspaceTemplate = {
 };
 
 type ParsedWorkspaceTemplate = WorkspaceState;
-const DEFAULT_WORKSTATION_IMPORT_MARKET: SlotMarket = "IN";
+const DEFAULT_WORKSTATION_IMPORT_MARKET: SlotMarket = "RU";
 
 const DEFAULT_EXTENDED_HOURS = {
   enabled: false,
@@ -287,7 +287,7 @@ function inferGridTemplate(slotCount: number): WorkspaceSnapshot["gridTemplate"]
 }
 
 function buildTemplateSlot(slot: Partial<ChartSlot> | null | undefined): ChartSlot {
-  const market = slot?.market === "US" ? "US" : "IN";
+  const market = slot?.market === "US" ? "US" : "RU";
   return {
     id: typeof slot?.id === "string" && slot.id ? slot.id : createSlotId(),
     ticker: typeof slot?.ticker === "string" && slot.ticker.trim() ? slot.ticker.trim().toUpperCase() : null,
@@ -406,7 +406,7 @@ export function parseWorkspaceTemplateConfig(
           : null;
       const timeframe = isTimeframe(row.timeframe) ? row.timeframe : "1D";
       const chartType = isChartType(row.chartType) ? row.chartType : "candle";
-      const market = row.market === "US" ? "US" : row.market === "IN" ? "IN" : fallbackMarket;
+      const market = row.market === "US" ? "US" : row.market === "RU" ? "RU" : fallbackMarket;
       return buildTemplateSlot({
         id: typeof row.id === "string" ? row.id : undefined,
         ticker,
@@ -535,7 +535,7 @@ function createSlotId(): string {
 
 function buildNewSlotFromActive(slots: ChartSlot[], activeSlotId: string | null): ChartSlot {
   const active = slots.find((s) => s.id === activeSlotId) ?? slots[0];
-  const market = active?.market ?? "IN";
+  const market = active?.market ?? "RU";
   return {
     id: createSlotId(),
     ticker: active?.ticker ?? null,
@@ -1472,7 +1472,7 @@ export function ChartWorkstationPage() {
 
     Promise.all(
       targetSlots.map(async (slot) => {
-        const market = slot.market === "IN" ? "NSE" : "NASDAQ";
+        const market = slot.market === "RU" ? "MOEX" : "NASDAQ";
         const interval = TIMEFRAME_TO_INTERVAL[slot.timeframe];
         const extended = slot.extendedHours.enabled && slot.market === "US";
         const compareSymbols = activeCompareSymbols.filter((symbol) => symbol !== slot.ticker?.toUpperCase());
@@ -1596,14 +1596,14 @@ export function ChartWorkstationPage() {
       (tf: ChartSlotTimeframe) => {
         updateSlotTimeframe(slotId, tf);
         const slot = slots.find((s) => s.id === slotId);
-        const isUS = (slot?.market ?? "IN") === "US";
+        const isUS = (slot?.market ?? "RU") === "US";
         updateSlotETH(slotId, { enabled: isUS && shouldDefaultExtendedHoursOn(tf) });
         if (!linkSettings.interval) return;
         const sourceGroup = slotLinkGroups[slotId] ?? "off";
         if (sourceGroup === "off") return;
         useChartWorkstationStore.setState((state) => ({
           slots: propagateLinkedSlots(state.slots, slotLinkGroups, slotId, (linkedSlot) => {
-            const linkedIsUS = (linkedSlot.market ?? "IN") === "US";
+            const linkedIsUS = (linkedSlot.market ?? "RU") === "US";
             return {
               ...linkedSlot,
               timeframe: tf,

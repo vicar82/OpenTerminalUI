@@ -118,7 +118,7 @@ export function BacktestResults({ initialTickers }: Props) {
                     name: `Backtest ${new Date().toLocaleDateString()}`,
                     initial_capital: 100000,
                     symbol: first,
-                    market: "NSE",
+                    market: "MOEX",
                     strategy: "momentum_rotation",
                     context: { lookback_days: lookback, top_n: topN, tickers: tickersList },
                   });

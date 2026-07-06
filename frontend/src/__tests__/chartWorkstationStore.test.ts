@@ -4,7 +4,7 @@ import { useChartWorkstationStore } from "../store/chartWorkstationStore";
 describe("chartWorkstationStore", () => {
   beforeEach(() => {
     useChartWorkstationStore.setState({
-      slots: [{ id: "test-init", ticker: null, market: "IN", timeframe: "1D", chartType: "candle", indicators: [] }],
+      slots: [{ id: "test-init", ticker: null, market: "RU", timeframe: "1D", chartType: "candle", indicators: [] }],
       activeSlotId: null,
       gridTemplate: { cols: 1, rows: 1, arrangement: "grid" },
       syncCrosshair: true,
@@ -45,10 +45,10 @@ describe("chartWorkstationStore", () => {
 
   it("updateSlotTicker changes ticker and market", () => {
     const { slots, updateSlotTicker } = useChartWorkstationStore.getState();
-    updateSlotTicker(slots[0].id, "RELIANCE", "IN");
+    updateSlotTicker(slots[0].id, "RELIANCE", "RU");
     const updated = useChartWorkstationStore.getState().slots[0];
     expect(updated.ticker).toBe("RELIANCE");
-    expect(updated.market).toBe("IN");
+    expect(updated.market).toBe("RU");
   });
 
   it("setGridTemplate updates template", () => {

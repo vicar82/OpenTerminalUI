@@ -54,7 +54,7 @@ describe("R6-229 Residuals Verification", () => {
         slots: [{ ticker: "RELIANCE", timeframe: "1D" }]
       };
       const parsed = parseWorkspaceTemplateConfig(config as any);
-      expect(parsed?.snapshot.slots[0].market).toBe("IN");
+      expect(parsed?.snapshot.slots[0].market).toBe("RU");
     });
 
     it("respects provided 'US' market", () => {

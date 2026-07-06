@@ -95,7 +95,7 @@ export function OverviewPanel({ stock, momPct, qoqPct, yoyPct }: Props) {
   return (
     <div className="space-y-3">
       <div className="rounded border border-terminal-border bg-terminal-panel p-4">
-        <div className="text-xs text-terminal-muted">{stock.ticker} | {stock.exchange || "NSE"}</div>
+        <div className="text-xs text-terminal-muted">{stock.ticker} | {stock.exchange || "MOEX"}</div>
         <div className="text-xl font-semibold">{stock.company_name || stock.ticker}</div>
         <div className="mt-1 text-sm text-terminal-muted">
           {stock.sector || "-"} | {stock.industry || "-"}

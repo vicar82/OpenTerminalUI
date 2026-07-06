@@ -150,8 +150,8 @@ const NAV_CARD_SECTIONS: Array<{ title: string; cards: NavCard[] }> = [
 ];
 
 const INITIAL_MARKET_ROWS: MarketRow[] = [
-  { symbol: "^NSEI", label: "NIFTY 50", ltp: 0, chg: 0, chgPct: 0, flash: null },
-  { symbol: "^BSESN", label: "SENSEX", ltp: 0, chg: 0, chgPct: 0, flash: null },
+  { symbol: "IMOEX", label: "Индекс МосБиржи", ltp: 0, chg: 0, chgPct: 0, flash: null },
+  { symbol: "RTSI", label: "Индекс РТС", ltp: 0, chg: 0, chgPct: 0, flash: null },
   { symbol: "^IXIC", label: "NASDAQ", ltp: 0, chg: 0, chgPct: 0, flash: null },
   { symbol: "^GSPC", label: "S&P 500", ltp: 0, chg: 0, chgPct: 0, flash: null },
   { symbol: "GC=F", label: "GOLD", ltp: 0, chg: 0, chgPct: 0, flash: null },
@@ -182,7 +182,7 @@ const EMPTY_SNAPSHOT: DashboardSnapshot = {
 };
 
 function formatPrice(value: number): string {
-  return value.toLocaleString("en-IN", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+  return value.toLocaleString("ru-RU", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 }
 
 function formatPercent(value: number | null, digits = 2): string {
@@ -190,15 +190,15 @@ function formatPercent(value: number | null, digits = 2): string {
   return `${value >= 0 ? "+" : ""}${value.toFixed(digits)}%`;
 }
 
-function formatInr(value: number | null): string {
-  if (value == null || !Number.isFinite(value)) return "INR --";
-  return `INR ${value.toLocaleString("en-IN", { maximumFractionDigits: 0 })}`;
+function formatRub(value: number | null): string {
+  if (value == null || !Number.isFinite(value)) return "RUB --";
+  return `RUB ${value.toLocaleString("ru-RU", { maximumFractionDigits: 0 })}`;
 }
 
-function formatSignedInr(value: number | null): string {
-  if (value == null || !Number.isFinite(value)) return "INR --";
+function formatSignedRub(value: number | null): string {
+  if (value == null || !Number.isFinite(value)) return "RUB --";
   const sign = value >= 0 ? "+" : "-";
-  return `${sign}INR ${Math.abs(value).toLocaleString("en-IN", { maximumFractionDigits: 0 })}`;
+  return `${sign}RUB ${Math.abs(value).toLocaleString("ru-RU", { maximumFractionDigits: 0 })}`;
 }
 
 function formatCompactDateLabel(date: string): string {
@@ -265,7 +265,7 @@ export function HomePage() {
       fetchPortfolio(),
       fetchWatchlist(),
       fetchBacktestV1Presets(),
-      fetchChainSummary("NIFTY"),
+      fetchChainSummary("IMOEX"),
       fetchPortfolioBenchmarkOverlay(),
     ]);
 
@@ -552,7 +552,7 @@ export function HomePage() {
   );
 
   const updatedLabel = snapshot.updatedAt
-    ? new Date(snapshot.updatedAt).toLocaleTimeString("en-IN", { hour12: false })
+    ? new Date(snapshot.updatedAt).toLocaleTimeString("ru-RU", { hour12: false })
     : "--:--:--";
 
   const profileMissingFields = useMemo(() => {
@@ -726,13 +726,13 @@ export function HomePage() {
                 <div className="mt-3 grid gap-3 lg:grid-cols-[minmax(0,1.15fr)_minmax(0,1fr)]">
                   <MetricCard
                     label="Net Liquidation"
-                    value={formatInr(snapshot.equityValue)}
+                    value={formatRub(snapshot.equityValue)}
                     tone={getMetricTone(snapshot.equityPnl)}
                     delta={
                       snapshot.equityPnl == null
                         ? undefined
                         : {
-                            label: `${formatSignedInr(snapshot.equityPnl)} (${formatPercent(equityPnlPct)})`,
+                            label: `${formatSignedRub(snapshot.equityPnl)} (${formatPercent(equityPnlPct)})`,
                             tone: getMetricTone(snapshot.equityPnl),
                           }
                     }
@@ -849,7 +849,7 @@ export function HomePage() {
                     points={performanceSeries}
                     benchmarkPoints={benchmarkSeries}
                     ariaLabel="Portfolio HQ chart"
-                    valueFormatter={(value) => formatInr(value)}
+                    valueFormatter={(value) => formatRub(value)}
                   />
                 </div>
               </div>

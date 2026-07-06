@@ -345,7 +345,7 @@ describe("ChartWorkstationPage shell workflow", () => {
     await waitFor(() => {
       const slot = useChartWorkstationStore.getState().slots[0];
       expect(slot?.ticker).toBe("INFY");
-      expect(slot?.market).toBe("IN");
+      expect(slot?.market).toBe("RU");
     });
   });
 });

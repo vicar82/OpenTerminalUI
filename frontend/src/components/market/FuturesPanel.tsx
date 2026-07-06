@@ -172,7 +172,7 @@ export function FuturesPanel() {
                 symbol={selectedUnderlying}
                 timeframe="1D"
                 historicalData={historicalData}
-                market="NSE"
+                market="MOEX"
                 activeIndicators={[]}
                 chartType="candle"
                 showVolume={true}

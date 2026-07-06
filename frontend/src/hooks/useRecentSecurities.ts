@@ -23,7 +23,7 @@ export function inferRecentSecurityMarket(countryCode?: string | null, exchangeO
   const normalizedCountry = String(countryCode ?? "").trim().toUpperCase();
   const normalizedExchange = String(exchangeOrMarket ?? "").trim().toUpperCase();
 
-  if (normalizedCountry === "IN" || normalizedExchange === "NSE" || normalizedExchange === "BSE") return "IN";
+  if (normalizedCountry === "RU" || normalizedExchange === "MOEX" || normalizedExchange === "MOEX") return "RU";
   return "US";
 }
 

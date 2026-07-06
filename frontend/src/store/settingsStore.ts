@@ -3,11 +3,11 @@ import { createJSONStorage, persist } from "zustand/middleware";
 
 import type { CountryCode, MarketCode } from "../types/markets";
 
-export type DisplayCurrency = "INR" | "USD";
+export type DisplayCurrency = "RUB" | "USD";
 export type RealtimeMode = "polling" | "ws";
 export type ThemeVariant = "terminal-noir" | "classic-bloomberg" | "light-desk" | "custom";
 export type RecentSecurityAssetClass = "equity" | "fno" | "crypto" | "commodity" | "forex" | "etf" | "mf";
-export type RecentSecurityMarket = "IN" | "US";
+export type RecentSecurityMarket = "RU" | "US";
 
 export type RecentSecurity = {
   symbol: string;
@@ -34,7 +34,7 @@ function sanitizeRecentSecurity(item: unknown): RecentSecurity | null {
 
   const name = String(row.name ?? symbol).trim() || symbol;
   const assetClass = isRecentSecurityAssetClass(row.assetClass) ? row.assetClass : "equity";
-  const market: RecentSecurityMarket = row.market === "IN" ? "IN" : "US";
+  const market: RecentSecurityMarket = row.market === "RU" ? "RU" : "US";
   const visitedAt = Number.isFinite(Number(row.visitedAt)) ? Number(row.visitedAt) : Date.now();
   const lastPrice = Number.isFinite(Number(row.lastPrice)) ? Number(row.lastPrice) : undefined;
   const changePercent = Number.isFinite(Number(row.changePercent)) ? Number(row.changePercent) : undefined;
@@ -93,18 +93,18 @@ type SettingsState = {
 };
 
 const countryDefaults: Record<CountryCode, { market: MarketCode; currency: DisplayCurrency }> = {
-  IN: { market: "NSE", currency: "INR" },
+  RU: { market: "MOEX", currency: "RUB" },
   US: { market: "NASDAQ", currency: "USD" },
 };
 
-const defaultCountry: CountryCode = "US";
+const defaultCountry: CountryCode = "RU";
 const defaultValues = countryDefaults[defaultCountry];
 
 function normalizePersistedMarket(value: unknown, country: CountryCode): MarketCode {
   const raw = String(value ?? "").trim().toUpperCase();
-  if (raw === "IN") return "NSE";
+  if (raw === "RU") return "MOEX";
   if (raw === "US") return "NASDAQ";
-  if (raw === "NSE" || raw === "BSE" || raw === "NYSE" || raw === "NASDAQ") return raw as MarketCode;
+  if (raw === "MOEX" || raw === "NYSE" || raw === "NASDAQ") return raw as MarketCode;
   return countryDefaults[country].market;
 }
 
@@ -161,7 +161,7 @@ export const useSettingsStore = create<SettingsState>()(
         const persisted = (persistedState as Partial<SettingsState>) ?? {};
         const current = currentState as SettingsState;
         const selectedCountry: CountryCode =
-          persisted.selectedCountry === "IN" || persisted.selectedCountry === "US"
+          persisted.selectedCountry === "RU" || persisted.selectedCountry === "US"
             ? persisted.selectedCountry
             : current.selectedCountry;
         return {

@@ -1,7 +1,7 @@
-type CurrencyCode = "INR" | "USD";
+type CurrencyCode = "RUB" | "USD";
 
 const CURRENCY_LOCALE: Record<CurrencyCode, string> = {
-  INR: "en-IN",
+  RUB: "ru-RU",
   USD: "en-US",
 };
 

@@ -5,7 +5,7 @@ import { ExtendedHoursConfig } from "../../store/chartWorkstationStore";
 interface ExtendedHoursToggleProps {
   value: ExtendedHoursConfig;
   onChange: (config: Partial<ExtendedHoursConfig>) => void;
-  market: "US" | "IN";
+  market: "US" | "RU";
   disabled?: boolean;
 }
 

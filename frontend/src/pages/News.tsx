@@ -155,7 +155,7 @@ async function loadTickerContextNews(ticker: string, companyName: string, market
   const searchTerms = Array.from(
     new Set([companyName, `${symbol} stock`, symbol].map((v) => v.trim()).filter((v) => v.length >= 2)),
   );
-  if (marketCode === "NSE" || marketCode === "BSE") {
+  if (marketCode === "MOEX" || marketCode === "MOEX") {
     searchTerms.unshift(
       `${symbol} ${marketCode} India stock`,
       `${companyName} ${marketCode}`.trim(),

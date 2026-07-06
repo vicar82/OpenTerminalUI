@@ -434,7 +434,7 @@ type Props = {
   drawingWorkspaceId?: string;
   extendedHours?: ExtendedHoursConfig;
   preMarketLevels?: PreMarketLevelConfig;
-  market?: "US" | "IN";
+  market?: "US" | "RU";
   panelId?: string;
   crosshairSyncGroupId?: string | null;
   comparisonSeries?: Array<{ symbol: string; data: ChartPoint[]; color?: string }>;
@@ -470,7 +470,7 @@ export function TradingChart({
   drawingWorkspaceId = "default-workspace",
   extendedHours,
   preMarketLevels,
-  market = "IN",
+  market = "RU",
   panelId,
   compact = false,
   crosshairSyncGroupId = "chart-workstation",
@@ -575,7 +575,7 @@ export function TradingChart({
   const lastRenderConfigKeyRef = useRef<string>("");
   const { pos: syncedPos, broadcast, syncEnabled } = useCrosshairSync();
   const useInternalRealtime = !String(crosshairSyncGroupId ?? "").startsWith("chart-workstation");
-  const quoteTokenMarket = market === "US" ? "NASDAQ" : market === "IN" ? "NSE" : String(market || "").toUpperCase();
+  const quoteTokenMarket = market === "US" ? "NASDAQ" : market === "RU" ? "MOEX" : String(market || "").toUpperCase();
   const externalTick = useQuotesStore((s) => s.ticksByToken[`${quoteTokenMarket}:${ticker.toUpperCase()}`] ?? null);
   const hoveredCandleBatchRef = useRef<ReturnType<typeof createRafBatcher<CandlePoint | null>> | null>(null);
   const syncedCursorBatchRef = useRef<
@@ -729,7 +729,7 @@ export function TradingChart({
     applyRealtimeTick(tick);
   }, [applyRealtimeTick, useInternalRealtime]);
 
-  const { subscribe } = useQuotesStream(market || "IN", handleTick);
+  const { subscribe } = useQuotesStream(market || "RU", handleTick);
 
   useEffect(() => {
     if (!useInternalRealtime) return;

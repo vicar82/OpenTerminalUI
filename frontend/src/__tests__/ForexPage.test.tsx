@@ -44,7 +44,7 @@ describe("ForexPage", () => {
       const url = String(input);
       if (url.endsWith("/api/forex/cross-rates")) {
         return jsonResponse({
-          currencies: ["USD", "EUR", "GBP", "JPY", "CHF", "AUD", "CAD", "INR"],
+          currencies: ["USD", "EUR", "GBP", "JPY", "CHF", "AUD", "CAD", "RUB"],
           matrix: [
             [1, 0.9231, 0.7852, 151.32, 0.8844, 1.5281, 1.3574, 83.14],
             [1.0833, 1, 0.8505, 163.93, 0.9581, 1.6553, 1.4715, 90.06],

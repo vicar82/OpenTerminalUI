@@ -478,7 +478,7 @@ export function CockpitDashboard() {
   const chartPoints = historyQuery.data?.data ?? [];
   const currency =
     stock?.classification?.currency ||
-    (selectedMarket === "NSE" || selectedMarket === "BSE" ? "INR" : "USD");
+    (selectedMarket === "MOEX" ? "RUB" : "USD");
   const currentPrice = asNumber(stock?.current_price ?? stockRecord.current_price);
   const changePct = pctValue(stock?.change_pct ?? stockRecord.change_pct);
   const week52Low = asNumber(stock?.fifty_two_week_low ?? stockRecord["52w_low"] ?? stockRecord.low_52_week);
@@ -705,14 +705,14 @@ export function CockpitDashboard() {
                 </button>
                 <button
                   type="button"
-                  onClick={() => setSelectedCountry("IN")}
+                  onClick={() => setSelectedCountry("RU")}
                   className={`rounded-sm border px-2 py-1 text-[11px] uppercase tracking-wide ${
-                    selectedMarket === "NSE" || selectedMarket === "BSE"
+                    selectedMarket === "MOEX"
                       ? "border-terminal-accent bg-terminal-accent/15 text-terminal-accent"
                       : "border-terminal-border bg-terminal-bg/60 text-terminal-muted hover:text-terminal-text"
                   }`}
                 >
-                  India
+                  Россия
                 </button>
                 {quickFocusSymbols.map((symbol) => (
                   <button

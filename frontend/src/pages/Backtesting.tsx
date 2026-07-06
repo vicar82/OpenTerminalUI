@@ -51,7 +51,7 @@ import { SweepPanel } from "../components/backtesting/panels/SweepPanel";
 
 type JobState = "idle" | "queued" | "running" | "done" | "failed";
 type BacktestTimeframe = "1D" | "1W" | "1M";
-type BacktestMarket = "NSE" | "BSE" | "NYSE" | "NASDAQ" | "AMEX";
+type BacktestMarket = "MOEX" | "NYSE" | "NASDAQ" | "AMEX";
 type ExecutionSlippageModel = "fixed_bps" | "volume_weighted" | "impact_curve";
 type VizTab =
   | "chart"
@@ -169,7 +169,7 @@ const VIZ_TABS: { key: VizTab; label: string; icon: string }[] = [
 ];
 
 const CUSTOM_STRATEGY_VALUE = "custom";
-const KNOWN_MARKETS: BacktestMarket[] = ["NSE", "BSE", "NYSE", "NASDAQ", "AMEX"];
+const KNOWN_MARKETS: BacktestMarket[] = ["MOEX", "NYSE", "NASDAQ", "AMEX"];
 
 function strategyIndicator(
   id: string,
@@ -397,7 +397,7 @@ export function BacktestingPage() {
   const [asset, setAsset] = useState((storeTicker || "RELIANCE").toUpperCase());
   const [assetSuggestions, setAssetSuggestions] = useState<SearchSymbolItem[]>([]);
   const [showAssetSuggestions, setShowAssetSuggestions] = useState(false);
-  const [market, setMarket] = useState<BacktestMarket>((selectedMarket as BacktestMarket) || "NSE");
+  const [market, setMarket] = useState<BacktestMarket>((selectedMarket as BacktestMarket) || "MOEX");
   const [tradeCapital, setTradeCapital] = useState(100000);
   const [start, setStart] = useState("2024-01-01");
   const [end, setEnd] = useState("2026-01-01");
@@ -427,7 +427,7 @@ export function BacktestingPage() {
     const filters = payload.filters ?? {};
     const tabs = payload.activeTabs ?? {};
     if (typeof filters.asset === "string") setAsset(filters.asset);
-    if (filters.market === "NSE" || filters.market === "BSE" || filters.market === "NYSE" || filters.market === "NASDAQ" || filters.market === "AMEX") setMarket(filters.market);
+    if (filters.market === "MOEX" || filters.market === "NYSE" || filters.market === "NASDAQ" || filters.market === "AMEX") setMarket(filters.market);
     if (filters.dataTimeframe === "1m" || filters.dataTimeframe === "5m" || filters.dataTimeframe === "15m" || filters.dataTimeframe === "1h" || filters.dataTimeframe === "1d") setDataTimeframe(filters.dataTimeframe);
     if (typeof filters.start === "string") setStart(filters.start);
     if (typeof filters.end === "string") setEnd(filters.end);
@@ -510,7 +510,7 @@ export function BacktestingPage() {
   }, [strategyMode]);
 
   const symbol = useMemo(() => asset.trim().toUpperCase(), [asset]);
-  const currencyCode = useMemo(() => (["NYSE", "NASDAQ", "AMEX"].includes(market) ? "USD" : "INR"), [market]);
+  const currencyCode = useMemo(() => (["NYSE", "NASDAQ", "AMEX"].includes(market) ? "USD" : "RUB"), [market]);
   const moneyLocale = useMemo(() => (currencyCode === "USD" ? "en-US" : "en-IN"), [currencyCode]);
   const fmtMoney = useCallback(
     (value: number): string =>
@@ -1586,8 +1586,8 @@ export function BacktestingPage() {
       <div className="grid grid-cols-1 gap-3 xl:grid-cols-[1fr_320px]">
         <TerminalPanel title="Панель управления бэктестингом" subtitle="Compact controls for chart-first workflow">
           <div className="grid grid-cols-1 gap-2 text-xs md:grid-cols-8">
-            <label className="md:col-span-1"><span className="mb-1 block text-[11px] uppercase tracking-wide text-terminal-muted">Asset (Ticker)</span><div className="relative"><input className="w-full rounded border border-terminal-border bg-terminal-bg px-2 py-1 text-xs uppercase" value={asset} onChange={(e) => { const raw = e.target.value.toUpperCase().trim(); const prefixed = raw.match(/^(NSE|BSE|NYSE|NASDAQ|AMEX):([A-Z0-9._-]+)$/); if (prefixed) { const ex = prefixed[1] as BacktestMarket; setMarket(ex); setAsset(prefixed[2]); } else { if (raw.endsWith(".NS")) setMarket("NSE"); if (raw.endsWith(".BO")) setMarket("BSE"); setAsset(raw); } setShowAssetSuggestions(true); }} onFocus={() => setShowAssetSuggestions(true)} onBlur={() => window.setTimeout(() => setShowAssetSuggestions(false), 150)} />{showAssetSuggestions && assetSuggestions.length > 0 && <div className="absolute left-0 right-0 top-[calc(100%+2px)] z-20 max-h-48 overflow-auto rounded border border-terminal-border bg-terminal-panel shadow-lg">{assetSuggestions.map((item) => (<button key={`${item.ticker}:${item.name}`} type="button" className="flex w-full items-center justify-between border-b border-terminal-border/40 px-2 py-1 text-left text-xs hover:bg-terminal-bg" onMouseDown={(e) => e.preventDefault()} onClick={() => { setAsset((item.ticker || "").toUpperCase()); const ex = (item.exchange || "").toUpperCase(); if (KNOWN_MARKETS.includes(ex as BacktestMarket)) setMarket(ex as BacktestMarket); setShowAssetSuggestions(false); }}><span>{item.ticker}</span><span className="ml-2 truncate text-[10px] text-terminal-muted">{item.name}</span></button>))}</div>}</div></label>
-            <label className="md:col-span-1"><span className="mb-1 block text-[11px] uppercase tracking-wide text-terminal-muted">Market</span><select className="w-full rounded border border-terminal-border bg-terminal-bg px-2 py-1 text-xs uppercase" value={market} onChange={(e) => setMarket(e.target.value as BacktestMarket)}><option value="NSE">NSE</option><option value="BSE">BSE</option><option value="NYSE">NYSE</option><option value="NASDAQ">NASDAQ</option><option value="AMEX">AMEX</option></select></label>
+            <label className="md:col-span-1"><span className="mb-1 block text-[11px] uppercase tracking-wide text-terminal-muted">Asset (Ticker)</span><div className="relative"><input className="w-full rounded border border-terminal-border bg-terminal-bg px-2 py-1 text-xs uppercase" value={asset} onChange={(e) => { const raw = e.target.value.toUpperCase().trim(); const prefixed = raw.match(/^(MOEX|NYSE|NASDAQ|AMEX):([A-Z0-9._-]+)$/); if (prefixed) { const ex = prefixed[1] as BacktestMarket; setMarket(ex); setAsset(prefixed[2]); } else { if (raw.endsWith(".ME")) setMarket("MOEX"); setAsset(raw); } setShowAssetSuggestions(true); }} onFocus={() => setShowAssetSuggestions(true)} onBlur={() => window.setTimeout(() => setShowAssetSuggestions(false), 150)} />{showAssetSuggestions && assetSuggestions.length > 0 && <div className="absolute left-0 right-0 top-[calc(100%+2px)] z-20 max-h-48 overflow-auto rounded border border-terminal-border bg-terminal-panel shadow-lg">{assetSuggestions.map((item) => (<button key={`${item.ticker}:${item.name}`} type="button" className="flex w-full items-center justify-between border-b border-terminal-border/40 px-2 py-1 text-left text-xs hover:bg-terminal-bg" onMouseDown={(e) => e.preventDefault()} onClick={() => { setAsset((item.ticker || "").toUpperCase()); const ex = (item.exchange || "").toUpperCase(); if (KNOWN_MARKETS.includes(ex as BacktestMarket)) setMarket(ex as BacktestMarket); setShowAssetSuggestions(false); }}><span>{item.ticker}</span><span className="ml-2 truncate text-[10px] text-terminal-muted">{item.name}</span></button>))}</div>}</div></label>
+            <label className="md:col-span-1"><span className="mb-1 block text-[11px] uppercase tracking-wide text-terminal-muted">Market</span><select className="w-full rounded border border-terminal-border bg-terminal-bg px-2 py-1 text-xs uppercase" value={market} onChange={(e) => setMarket(e.target.value as BacktestMarket)}><option value="MOEX">MOEX</option><option value="NYSE">NYSE</option><option value="NASDAQ">NASDAQ</option><option value="AMEX">AMEX</option></select></label>
             <label className="md:col-span-1"><span className="mb-1 block text-[11px] uppercase tracking-wide text-terminal-muted">Data TF</span><select className="w-full rounded border border-terminal-border bg-terminal-bg px-2 py-1 text-xs" value={dataTimeframe} onChange={(e) => setDataTimeframe(e.target.value as any)}><option value="1d">Daily</option><option value="1h">1 Hour</option><option value="15m">15 Min</option><option value="5m">5 Min</option><option value="1m">1 Min</option></select></label>
             <label className="md:col-span-1"><span className="mb-1 block text-[11px] uppercase tracking-wide text-terminal-muted">Start</span><input type="date" className="w-full rounded border border-terminal-border bg-terminal-bg px-2 py-1 text-xs" value={start} onChange={(e) => setStart(e.target.value)} min={dataTimeframe !== "1d" ? new Date(Date.now() - 180 * 24 * 60 * 60 * 1000).toISOString().split('T')[0] : undefined} /></label>
             <label className="md:col-span-1"><span className="mb-1 block text-[11px] uppercase tracking-wide text-terminal-muted">End</span><input type="date" className="w-full rounded border border-terminal-border bg-terminal-bg px-2 py-1 text-xs" value={end} onChange={(e) => setEnd(e.target.value)} /></label>

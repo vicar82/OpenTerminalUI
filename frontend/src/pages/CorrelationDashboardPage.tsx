@@ -116,7 +116,7 @@ export function CorrelationDashboardPage() {
     }
     if (searchTimeoutRef.current) clearTimeout(searchTimeoutRef.current);
     searchTimeoutRef.current = setTimeout(() => {
-      searchSymbols(query, "NSE")
+      searchSymbols(query, "MOEX")
         .then((results) => setSuggestions(results.slice(0, 8)))
         .catch(() => setSuggestions([]));
     }, 250);

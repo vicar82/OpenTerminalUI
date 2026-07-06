@@ -82,7 +82,7 @@ export async function fetchUniverseMembers(
   return data;
 }
 
-export async function fetchFinancials(ticker: string, period: "annual" | "quarterly", market = "NSE"): Promise<FinancialsResponse> {
+export async function fetchFinancials(ticker: string, period: "annual" | "quarterly", market = "MOEX"): Promise<FinancialsResponse> {
   return getFinancials(ticker, market, period);
 }
 

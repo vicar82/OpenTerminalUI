@@ -1,6 +1,6 @@
 import { api } from "./base";
 
-export type MarketCode = "US" | "NSE" | "BSE" | "INDIA" | string;
+export type MarketCode = "US" | "MOEX" | "MOEX" | "INDIA" | string;
 
 export type LabLeaderboardEntry = {
   id?: string;

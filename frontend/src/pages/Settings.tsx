@@ -64,7 +64,7 @@ export function SettingsPage() {
       <TerminalPanel title="Настройки интерфейса" subtitle="Dense terminal defaults">
         <div className="grid grid-cols-1 gap-2 lg:grid-cols-6">
           <TerminalInput as="select" value={selectedCountry} onChange={(e) => setSelectedCountry(e.target.value as CountryCode)}>
-            <option value="IN">IN</option>
+            <option value="RU">IN</option>
             <option value="US">US</option>
           </TerminalInput>
           <TerminalInput as="select" value={selectedMarket} onChange={(e) => setSelectedMarket(e.target.value as MarketCode)}>
@@ -74,8 +74,8 @@ export function SettingsPage() {
               </option>
             ))}
           </TerminalInput>
-          <TerminalInput as="select" value={displayCurrency} onChange={(e) => setDisplayCurrency(e.target.value as "INR" | "USD")} title="Display currency">
-            <option value="INR">INR</option>
+          <TerminalInput as="select" value={displayCurrency} onChange={(e) => setDisplayCurrency(e.target.value as "RUB" | "USD")} title="Display currency">
+            <option value="RUB">INR</option>
             <option value="USD">USD</option>
           </TerminalInput>
           <TerminalInput as="select" value={realtimeMode} onChange={(e) => setRealtimeMode(e.target.value as "polling" | "ws")}>

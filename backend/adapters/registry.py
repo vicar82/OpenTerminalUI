@@ -9,8 +9,8 @@ import yaml
 from backend.adapters.base import DataAdapter
 from backend.adapters.alpaca import AlpacaAdapter
 from backend.adapters.crypto import CryptoDataAdapter
-from backend.adapters.kite import KiteAdapter
 from backend.adapters.mock import MockDataAdapter
+from backend.adapters.moex import MOEXAdapter
 from backend.adapters.yahoo import YahooFinanceAdapter
 from backend.adapters.us_options_adapter import USOptionsAdapter
 from backend.core.failover import FailoverSlot, call_with_failover
@@ -32,7 +32,7 @@ class AdapterRegistry:
         self.cooldown_seconds = cooldown_seconds
         self._factory = {
             "alpaca": lambda: AlpacaAdapter(),
-            "kite": lambda: KiteAdapter(),
+            "moex": lambda: MOEXAdapter(),
             "yahoo": lambda: YahooFinanceAdapter(),
             "us_options": lambda: USOptionsAdapter(),
             "crypto": lambda: CryptoDataAdapter(),
@@ -42,13 +42,12 @@ class AdapterRegistry:
     def _load_config(self) -> dict[str, Any]:
         if not self.config_path.exists():
             return {
-                "default": {"primary": "kite", "fallback": ["yahoo"]},
+                "default": {"primary": "yahoo", "fallback": ["moex"]},
                 "exchanges": {
-                    "NSE": {"primary": "kite", "fallback": ["yahoo"]},
-                    "BSE": {"primary": "kite", "fallback": ["yahoo"]},
-                    "NASDAQ": {"primary": "alpaca", "fallback": ["yahoo"]},
-                    "NYSE": {"primary": "alpaca", "fallback": ["yahoo"]},
-                    "AMEX": {"primary": "alpaca", "fallback": ["yahoo"]},
+                    "MOEX": {"primary": "moex", "fallback": ["yahoo"]},
+                    "NASDAQ": {"primary": "yahoo", "fallback": []},
+                    "NYSE": {"primary": "yahoo", "fallback": []},
+                    "AMEX": {"primary": "yahoo", "fallback": []},
                     "CRYPTO": {"primary": "crypto", "fallback": ["yahoo"]},
                 },
             }
@@ -57,12 +56,12 @@ class AdapterRegistry:
     def _chain_for_exchange(self, exchange: str) -> AdapterChain:
         ex = exchange.strip().upper()
         exchanges = self._config.get("exchanges", {})
-        row = exchanges.get(ex) or self._config.get("default") or {"primary": "kite", "fallback": ["yahoo"]}
-        primary = str(row.get("primary") or "kite").strip().lower()
+        row = exchanges.get(ex) or self._config.get("default") or {"primary": "yahoo", "fallback": ["moex"]}
+        primary = str(row.get("primary") or "yahoo").strip().lower()
         fallback = [str(x).strip().lower() for x in (row.get("fallback") or []) if str(x).strip()]
         if ex in {"NASDAQ", "NYSE", "AMEX"}:
             if primary != "alpaca":
-                primary = "alpaca"
+                primary = "yahoo"
             if "yahoo" not in fallback:
                 fallback.append("yahoo")
         return AdapterChain(primary=primary, fallback=fallback)

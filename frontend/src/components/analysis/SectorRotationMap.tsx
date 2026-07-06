@@ -97,7 +97,7 @@ export function SectorRotationMap({ defaultBenchmark = "SPY", width = "100%", he
           >
             <option value="SPY">SPY (US)</option>
             <option value="QQQ">QQQ (US Tech)</option>
-            <option value="^NSEI">NIFTY 50 (India)</option>
+            <option value="IMOEX">NIFTY 50 (India)</option>
           </select>
         </div>
 

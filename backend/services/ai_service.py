@@ -115,7 +115,12 @@ class AIQueryService:
         }
 
     async def _call_llm(self, query: str) -> str:
-        # Prefer the locally hosted Gemma model via LM Studio; no API key needed.
+        # Prefer the locally hosted model via Ollama when it is configured.
+        if self.settings.ai_provider == "ollama":
+            try:
+                return await self._call_ollama(query)
+            except Exception as exc:
+                logger.warning(f"Ollama call failed, falling back: {exc}")
         if self.settings.lm_studio_enabled:
             try:
                 return await self._call_lmstudio(query)
@@ -123,7 +128,21 @@ class AIQueryService:
                 logger.warning(f"LM Studio call failed, falling back: {exc}")
         if self.settings.ai_provider == "openai" and self.settings.openai_api_key:
             return await self._call_openai(query)
+        # Final fallback to Ollama regardless of ai_provider so the terminal works offline.
         return await self._call_ollama(query)
+
+    async def _call_ollama(self, query: str) -> str:
+        from backend.services.llm.factory import get_llm_provider
+        provider = get_llm_provider(provider="ollama")
+        result = await provider.complete(
+            [
+                {"role": "system", "content": SYSTEM_PROMPT},
+                {"role": "user", "content": query},
+            ],
+            temperature=0.1,
+            max_tokens=400,
+        )
+        return result.content or ""
 
     async def _call_lmstudio(self, query: str) -> str:
         client = get_lm_studio_client()
@@ -169,7 +188,7 @@ class AIQueryService:
 
         try:
             request = ScreenerScanRequest(
-                markets=markets or ["NSE", "NYSE", "NASDAQ"],
+                markets=markets or ["MOEX", "NYSE", "NASDAQ"],
                 filters=valid_filters,
                 limit=limit,
             )
@@ -200,12 +219,13 @@ class AIQueryService:
             resp.raise_for_status()
             return resp.json()["choices"][0]["message"]["content"]
 
-    async def _call_ollama(self, query: str) -> str:
+    async def _call_legacy_ollama(self, query: str) -> str:
+        """Legacy Ollama native /api/chat call kept for compatibility."""
         async with httpx.AsyncClient(timeout=60.0) as client:
             resp = await client.post(
                 f"{self.settings.ollama_base_url}/api/chat",
                 json={
-                    "model": "llama3", # or configurable
+                    "model": self.settings.ollama_model,
                     "messages": [
                         {"role": "system", "content": SYSTEM_PROMPT},
                         {"role": "user", "content": query}

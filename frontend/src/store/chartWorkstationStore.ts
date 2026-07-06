@@ -10,7 +10,7 @@ function makeId(): string {
 
 export type ChartSlotTimeframe = "1m" | "5m" | "15m" | "1h" | "1D" | "1W" | "1M";
 export type ChartSlotType = "candle" | "line" | "area";
-export type SlotMarket = "IN" | "US";
+export type SlotMarket = "RU" | "US";
 
 export interface ExtendedHoursConfig {
   enabled: boolean;
@@ -96,7 +96,7 @@ function makeSlot(): ChartSlot {
     id: makeId(),
     ticker: null,
     companyName: null,
-    market: "IN",
+    market: "RU",
     timeframe: "1D",
     chartType: "candle",
     indicators: [],
@@ -120,7 +120,7 @@ function normalizeSlot(slot: Partial<ChartSlot> | undefined): ChartSlot {
     companyName: typeof (slot as any)?.companyName === "string" && (slot as any).companyName.trim()
       ? (slot as any).companyName.trim()
       : null,
-    market: slot?.market === "US" ? "US" : "IN",
+    market: slot?.market === "US" ? "US" : "RU",
     timeframe: (slot?.timeframe as ChartSlotTimeframe) ?? "1D",
     chartType: (slot?.chartType as ChartSlotType) ?? "candle",
     indicators: normalizeIndicators((slot as any)?.indicators),

@@ -21,7 +21,7 @@ export function Sidebar() {
     { label: "Сравнение", path: "/equity/compare", key: "CMP", hint: "Split View" },
     { label: "Скринер", path: "/equity/screener", key: "F2" },
     { label: "Лидеры", path: "/equity/hotlists", key: "HOT", hint: "Movers" },
-    { label: "Инсайдеры", path: "/equity/insider", key: "IN", hint: "Исследования" },
+    { label: "Инсайдеры", path: "/equity/insider", key: "RU", hint: "Исследования" },
     { label: "Тепловая карта", path: "/equity/heatmap", key: "HM", hint: "Рынок" },
     { label: "Дивиденды", path: "/equity/dividends", key: "DIV", hint: "Income" },
     { label: "Отн. сила", path: "/equity/rs", key: "RS", hint: "Relative" },
@@ -66,7 +66,7 @@ export function Sidebar() {
           Главная
         </NavLink>
         <NavLink
-          to={`/fno?symbol=${encodeURIComponent((ticker || "NIFTY").toUpperCase())}`}
+          to={`/fno?symbol=${encodeURIComponent((ticker || "IMOEX").toUpperCase())}`}
           className="block rounded px-2 py-2 text-terminal-muted hover:bg-terminal-bg hover:text-terminal-text"
         >
           Переключиться в F&O {"->"}

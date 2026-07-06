@@ -45,7 +45,7 @@ vi.mock("../realtime/useQuotesStream", () => ({
 vi.mock("../store/settingsStore", () => ({
   useSettingsStore: (selector: (state: { selectedMarket: string }) => unknown) =>
     selector({
-      selectedMarket: "NSE",
+      selectedMarket: "MOEX",
     }),
 }));
 

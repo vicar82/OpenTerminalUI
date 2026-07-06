@@ -49,6 +49,10 @@ def classify_intent(prompt: str) -> str:
 
 def _free_models(settings: Any, field: str, defaults: list[str]) -> list[str]:
     configured = getattr(settings, field, None) or defaults
+    # Local providers (ollama, lmstudio) do not use OpenRouter-style :free suffixes.
+    provider = (settings.agent_provider or "").lower()
+    if provider in {"ollama", "lmstudio"}:
+        return [model for model in configured if isinstance(model, str)]
     return [model for model in configured if isinstance(model, str) and model.endswith(":free")]
 
 

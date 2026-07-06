@@ -5,7 +5,7 @@ import { FreshnessBadge } from "../shared/chart/FreshnessBadge";
 describe("FreshnessBadge", () => {
   it("shows Live when data is fresh", () => {
     const recent = new Date().toISOString();
-    render(<FreshnessBadge lastUpdate={recent} exchange="NSE" />);
+    render(<FreshnessBadge lastUpdate={recent} exchange="MOEX" />);
     const el = screen.getByText(/Live|Market closed/);
     expect(el).toBeTruthy();
   });
@@ -18,7 +18,7 @@ describe("FreshnessBadge", () => {
   });
 
   it("handles null lastUpdate", () => {
-    render(<FreshnessBadge lastUpdate={null} exchange="NSE" />);
+    render(<FreshnessBadge lastUpdate={null} exchange="MOEX" />);
     expect(screen.getByText(/Offline|Market closed/)).toBeTruthy();
   });
 });

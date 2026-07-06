@@ -12,7 +12,7 @@ function getMarketStatus(exchange: Exchange): MarketStatus {
 
   if (day === 0 || day === 6) return "closed";
 
-  if (["NSE", "BSE", "NFO"].includes(exchange)) {
+  if (["MOEX", "MOEX", "NFO"].includes(exchange)) {
     const istOffset = 5.5 * 60;
     const utcMinutes = now.getUTCHours() * 60 + now.getUTCMinutes();
     const istMinutes = utcMinutes + istOffset;

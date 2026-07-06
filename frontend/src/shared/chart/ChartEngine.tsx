@@ -79,7 +79,7 @@ export function ChartEngine({
   showVolume,
   enableRealtime,
   height = 540,
-  market = "NSE",
+  market = "MOEX",
   symbolIsFnO = false,
   onCrosshairOHLC,
   onTick,

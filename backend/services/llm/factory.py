@@ -4,7 +4,7 @@ from backend.config.settings import get_settings
 from backend.services.llm.base import LLMError
 from backend.services.llm.openai_compatible import OpenAICompatibleProvider
 
-AGENT_PROVIDERS = ("openrouter", "openai", "lmstudio")
+AGENT_PROVIDERS = ("openrouter", "openai", "lmstudio", "ollama")
 
 
 def get_llm_provider(
@@ -13,7 +13,7 @@ def get_llm_provider(
 ) -> OpenAICompatibleProvider:
     """Build an OpenAI-compatible provider for the agent from settings + overrides."""
     settings = get_settings()
-    provider = (provider or settings.agent_provider or "openrouter").lower()
+    provider = (provider or settings.agent_provider or "ollama").lower()
     timeout = settings.agent_timeout_seconds
 
     if provider == "openrouter":
@@ -41,6 +41,13 @@ def get_llm_provider(
             base_url=settings.lm_studio_base_url,
             api_key=None,
             model=model or settings.lm_studio_model,
+            timeout=timeout,
+        )
+    if provider == "ollama":
+        return OpenAICompatibleProvider(
+            base_url=f"{settings.ollama_base_url.rstrip('/')}/v1",
+            api_key=api_key or settings.ollama_api_key,
+            model=model or settings.ollama_model,
             timeout=timeout,
         )
     raise LLMError(f"Unknown agent provider: {provider}")

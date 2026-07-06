@@ -89,7 +89,7 @@ describe("contextOverlays helpers", () => {
     );
     expect(
       describeMarketState({
-        market: "IN",
+        market: "RU",
         replayEnabled: false,
         bar,
         liveMarketStatus: { marketState: [{ marketStatus: "OPEN" }] },

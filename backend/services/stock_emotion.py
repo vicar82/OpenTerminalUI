@@ -358,9 +358,10 @@ async def analyze_stock_emotion(
     engine = "fallback"
     analyzed: list[dict[str, Any]] = []
 
-    # Cloud providers need an API key; LM Studio is keyless/local. Skip the call
-    # (use lexical fallback) when no usable provider is configured.
-    can_try = provider is not None and (bool(getattr(provider, "api_key", None)) or provider_name == "lmstudio")
+    # Cloud providers need an API key; LM Studio and Ollama are keyless/local.
+    can_try = provider is not None and (
+        bool(getattr(provider, "api_key", None)) or provider_name in {"lmstudio", "ollama"}
+    )
     raw_analyses: list[Any] = []
     if can_try:
         try:

@@ -100,7 +100,7 @@ function formatAssetClassLabel(value: string) {
 function findSymbolMetadata(
   symbol: string,
   searchUniverse: SearchSymbolItem[],
-  recentSecurities: Array<{ symbol: string; name: string; market: "IN" | "US" }>,
+  recentSecurities: Array<{ symbol: string; name: string; market: "RU" | "US" }>,
 ) {
   const match = searchUniverse.find((item) => String(item.ticker || "").trim().toUpperCase() === symbol);
   if (match) {

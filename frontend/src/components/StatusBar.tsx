@@ -12,14 +12,14 @@ function formatClock(date: Date): string {
     minute: "2-digit",
     second: "2-digit",
     hour12: false,
-    timeZone: "Asia/Kolkata",
+    timeZone: "Europe/Moscow",
   }).format(date);
 
   const day = new Intl.DateTimeFormat("en-GB", {
     day: "2-digit",
     month: "short",
     year: "numeric",
-    timeZone: "Asia/Kolkata",
+    timeZone: "Europe/Moscow",
   }).format(date);
 
   return `${time} IST | ${day.toUpperCase()}`;

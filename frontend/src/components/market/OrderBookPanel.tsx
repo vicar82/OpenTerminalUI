@@ -94,7 +94,7 @@ function normalizeSymbol(value: string): string {
 
 function normalizeMarket(value: string): string {
   const raw = String(value || "").trim().toUpperCase();
-  if (raw === "NSE" || raw === "BSE" || raw === "IN") return "IN";
+  if (raw === "MOEX" || raw === "MOEX" || raw === "RU") return "RU";
   if (raw === "CRYPTO" || raw === "BINANCE") return "CRYPTO";
   return "US";
 }

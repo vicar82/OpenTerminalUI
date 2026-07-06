@@ -13,15 +13,15 @@ import { useStockStore } from "../../store/stockStore";
 import { COUNTRY_MARKETS } from "../../types";
 import type { CountryCode, MarketCode } from "../../types";
 
-type DisplayCurrency = "INR" | "USD";
+type DisplayCurrency = "RUB" | "USD";
 
 const COUNTRY_FLAGS: Record<CountryCode, string> = {
-  IN: "🇮🇳",
+  RU: "🇷🇺",
   US: "🇺🇸",
 };
 
 const COUNTRY_DEFAULT_MARKET: Record<CountryCode, MarketCode> = {
-  IN: "NSE",
+  RU: "MOEX",
   US: "NASDAQ",
 };
 
@@ -41,7 +41,7 @@ export function TopBar({ hideTickerLoader = false, hideMarketMarquee = false }: 
   const selectedCountry = useSettingsStore((s) => s.selectedCountry);
   const selectedMarket = useSettingsStore((s) => s.selectedMarket);
   const displayCurrency = useSettingsStore((s) => s.displayCurrency);
-  const setSelectedCountry = useSettingsStore((s) => s.selectedCountry === "IN" ? s.setSelectedCountry : s.setSelectedCountry); // keep store reactive
+  const setSelectedCountry = useSettingsStore((s) => s.selectedCountry === "RU" ? s.setSelectedCountry : s.setSelectedCountry); // keep store reactive
   const setSelectedMarket = useSettingsStore((s) => s.setSelectedMarket);
   const setDisplayCurrency = useSettingsStore((s) => s.setDisplayCurrency);
   const { addRecent } = useRecentSecurities();
@@ -64,8 +64,8 @@ export function TopBar({ hideTickerLoader = false, hideMarketMarquee = false }: 
     marketState?: Array<{ marketStatus?: string; tradeDate?: string }>;
     nifty50?: number | null;
     sensex?: number | null;
-    inrUsd?: number | null;
-    usdInr?: number | null;
+    rubUsd?: number | null;
+    usdRub?: number | null;
     sp500?: number | null;
     nikkei225?: number | null;
     hangseng?: number | null;
@@ -81,8 +81,8 @@ export function TopBar({ hideTickerLoader = false, hideMarketMarquee = false }: 
   const marketError = statusPayload?.error;
   const nifty50 = typeof statusPayload?.nifty50 === "number" ? statusPayload.nifty50 : null;
   const sensex = typeof statusPayload?.sensex === "number" ? statusPayload.sensex : null;
-  const inrUsd = typeof statusPayload?.inrUsd === "number" ? statusPayload.inrUsd : null;
-  const usdInr = typeof statusPayload?.usdInr === "number" ? statusPayload.usdInr : null;
+  const rubUsd = typeof statusPayload?.rubUsd === "number" ? statusPayload.rubUsd : null;
+  const usdRub = typeof statusPayload?.usdRub === "number" ? statusPayload.usdRub : null;
   const sp500 = typeof statusPayload?.sp500 === "number" ? statusPayload.sp500 : null;
   const nikkei225 = typeof statusPayload?.nikkei225 === "number" ? statusPayload.nikkei225 : null;
   const hangseng = typeof statusPayload?.hangseng === "number" ? statusPayload.hangseng : null;
@@ -94,7 +94,7 @@ export function TopBar({ hideTickerLoader = false, hideMarketMarquee = false }: 
   const hangsengPct = typeof statusPayload?.hangsengPct === "number" ? statusPayload.hangsengPct : null;
   const hasIndexData = nifty50 !== null || sensex !== null;
   const hasGlobalData = sp500 !== null || nikkei225 !== null || hangseng !== null;
-  const hasFxData = usdInr !== null || inrUsd !== null;
+  const hasFxData = usdRub !== null || rubUsd !== null;
   const isFallback = Boolean(statusPayload?.fallbackEnabled) || !statusPayload?.source?.nseIndices;
   const marketStateLabel = String(statusPayload?.marketState?.[0]?.marketStatus || "").toUpperCase();
   const feedStateLabel = !hasIndexData
@@ -278,7 +278,7 @@ export function TopBar({ hideTickerLoader = false, hideMarketMarquee = false }: 
     );
     void handleLoad();
   }, [addRecent, handleLoad, selectedCountry, selectedMarket, setTicker]);
-  const safeTicker = (ticker || "NIFTY").toUpperCase();
+  const safeTicker = (ticker || "IMOEX").toUpperCase();
 
   return (
     <div className="relative z-20 border-b border-terminal-border bg-terminal-panel">
@@ -358,7 +358,7 @@ export function TopBar({ hideTickerLoader = false, hideMarketMarquee = false }: 
             value={selectedCountry}
             onChange={(e) => setSelectedCountry(e.target.value as CountryCode)}
           >
-            <option value="IN">{COUNTRY_FLAGS.IN} IN</option>
+            <option value="RU">{COUNTRY_FLAGS.RU} RU</option>
             <option value="US">{COUNTRY_FLAGS.US} US</option>
           </select>
           <select
@@ -381,7 +381,7 @@ export function TopBar({ hideTickerLoader = false, hideMarketMarquee = false }: 
             title="Display currency"
             aria-label="Display currency"
           >
-            <option value="INR">INR</option>
+            <option value="RUB">RUB</option>
             <option value="USD">USD</option>
           </select>
         </div>

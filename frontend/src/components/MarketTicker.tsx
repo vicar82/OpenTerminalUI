@@ -6,9 +6,9 @@ type TickerEntry = {
 };
 
 const TICKER_DATA: TickerEntry[] = [
-  { symbol: "NIFTY", value: "24,856.50", delta: "124.30", up: true },
+  { symbol: "IMOEX", value: "24,856.50", delta: "124.30", up: true },
   { symbol: "SENSEX", value: "81,234.10", delta: "89.40", up: false },
-  { symbol: "BANKNIFTY", value: "52,120.00", delta: "310.55", up: true },
+  { symbol: "MOEX10", value: "52,120.00", delta: "310.55", up: true },
   { symbol: "RELIANCE", value: "2,891.50", delta: "12.30", up: true },
   { symbol: "TCS", value: "4,120.80", delta: "18.90", up: false },
   { symbol: "INFY", value: "1,890.20", delta: "8.45", up: true },

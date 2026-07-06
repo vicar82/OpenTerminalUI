@@ -66,13 +66,13 @@ export function MarketStatusBar(_props: { tickerOverride?: string | null } = {})
 
   const marketPayload = (marketStatus ?? {}) as {
     marketState?: Array<{ marketStatus?: string }>;
-    nseStatus?: string;
+    moexStatus?: string;
     nyseStatus?: string;
     nextOpenTime?: string;
     fallbackEnabled?: boolean;
   };
 
-  const nseOpen = marketLabel(marketPayload.marketState?.[0]?.marketStatus ?? marketPayload.nseStatus);
+  const moexOpen = marketLabel(marketPayload.marketState?.[0]?.marketStatus ?? marketPayload.moexStatus);
   const nyseOpen = marketLabel(marketPayload.nyseStatus);
   const connectionTone =
     connectionState === "connected" ? "green" : connectionState === "connecting" ? "yellow" : "red";
@@ -83,15 +83,15 @@ export function MarketStatusBar(_props: { tickerOverride?: string | null } = {})
     <div className="border-t border-terminal-border bg-[#0D1117] px-3 py-0.5 text-[11px]">
       <div className="grid h-5 grid-cols-[auto_1fr_auto] items-center gap-3 text-terminal-muted">
         <div className="inline-flex items-center gap-3 ot-type-data whitespace-nowrap">
-          <span><span className="text-terminal-text">IST</span> {formatZone(now, "Asia/Kolkata")}</span>
+          <span><span className="text-terminal-text">MSK</span> {formatZone(now, "Europe/Moscow")}</span>
           <span><span className="text-terminal-text">ET</span> {formatZone(now, "America/New_York")}</span>
           <span><span className="text-terminal-text">UTC</span> {formatZone(now, "UTC")}</span>
         </div>
 
         <div className="inline-flex min-w-0 items-center justify-center gap-3 overflow-hidden whitespace-nowrap ot-type-status">
           <span className="inline-flex items-center gap-1">
-            <Dot tone={nseOpen === "OPEN" ? "green" : "gray"} />
-            <span>NSE: {nseOpen}</span>
+            <Dot tone={moexOpen === "OPEN" ? "green" : "gray"} />
+            <span>MOEX: {moexOpen}</span>
           </span>
           <span className="inline-flex items-center gap-1">
             <Dot tone={nyseOpen === "OPEN" ? "green" : "gray"} />

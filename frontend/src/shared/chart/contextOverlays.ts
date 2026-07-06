@@ -273,7 +273,7 @@ export function describeSessionState(
 }
 
 export function describeMarketState(args: {
-  market: "US" | "IN";
+  market: "US" | "RU";
   replayEnabled: boolean;
   bar: ContextOverlayBar | null | undefined;
   liveMarketStatus?: Record<string, unknown> | null;

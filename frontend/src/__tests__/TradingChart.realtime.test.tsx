@@ -69,7 +69,7 @@ describe("TradingChart realtime data hooks", () => {
       ({ revision }: { revision: number }) => {
         void revision;
         return useRealtimeChart(
-          "NSE",
+          "MOEX",
           "AAPL",
           "1m",
           seedBars,
@@ -117,7 +117,7 @@ describe("TradingChart realtime data hooks", () => {
       ({ revision }: { revision: number }) => {
         void revision;
         return useRealtimeChart(
-          "NSE",
+          "MOEX",
           "AAPL",
           "1D",
           seedBars,

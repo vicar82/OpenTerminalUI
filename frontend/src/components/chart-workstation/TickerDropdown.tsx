@@ -6,8 +6,8 @@ import "./ChartWorkstation.css";
 
 interface Props {
   value: string | null;
-  market: "IN" | "US";
-  onChange: (ticker: string, market: "IN" | "US", companyName?: string | null) => void;
+  market: "RU" | "US";
+  onChange: (ticker: string, market: "RU" | "US", companyName?: string | null) => void;
   className?: string;
   inputClassName?: string;
   placeholder?: string;
@@ -46,7 +46,7 @@ export function TickerDropdown({
       }
       try {
         setLoading(true);
-        const apiMarket = market === "IN" ? "NSE" : "NASDAQ";
+        const apiMarket = market === "RU" ? "MOEX" : "NASDAQ";
         const r = await searchSymbols(q, apiMarket);
         setResults(r.slice(0, 8));
         setSelectedIdx(0);
@@ -60,7 +60,7 @@ export function TickerDropdown({
   };
 
   const pick = (item: SearchSymbolItem) => {
-    const resolvedMarket: "IN" | "US" = item.country_code === "US" ? "US" : "IN";
+    const resolvedMarket: "RU" | "US" = item.country_code === "US" ? "US" : "RU";
     onChange(item.ticker, resolvedMarket, item.name ?? null);
     setQuery(item.ticker);
     setOpen(false);
@@ -123,7 +123,7 @@ export function TickerDropdown({
                 size="sm"
                 className="shrink-0"
               >
-                {item.country_code === "US" ? "US" : "IN"}
+                {item.country_code === "US" ? "US" : "RU"}
               </TerminalBadge>
             </span>
             <span className="truncate text-[10px] opacity-60">{(item.name ?? "").slice(0, 20)}</span>

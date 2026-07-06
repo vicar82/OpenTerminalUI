@@ -746,7 +746,7 @@ export type JournalListFilters = {
 export type HeatmapGroupBy = "sector" | "industry";
 export type HeatmapPeriod = "1d" | "1w" | "1m" | "3m" | "ytd" | "1y";
 export type HeatmapSizeBy = "market_cap" | "volume" | "turnover";
-export type HeatmapMarket = "IN" | "US";
+export type HeatmapMarket = "RU" | "US";
 
 export type HeatmapLeaf = {
   symbol: string;

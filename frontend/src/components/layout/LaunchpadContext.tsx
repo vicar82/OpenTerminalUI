@@ -188,8 +188,8 @@ function defaultPresets(): LaunchpadLayoutPreset[] {
       id: "monitoring",
       name: "Monitoring",
       panels: [
-        makePanel("m-chart-1", "chart", "Chart 1", 0, 0, 3, 5, "NIFTY"),
-        makePanel("m-chart-2", "chart", "Chart 2", 3, 0, 3, 5, "BANKNIFTY"),
+        makePanel("m-chart-1", "chart", "Chart 1", 0, 0, 3, 5, "IMOEX"),
+        makePanel("m-chart-2", "chart", "Chart 2", 3, 0, 3, 5, "MOEX10"),
         makePanel("m-chart-3", "chart", "Chart 3", 6, 0, 3, 5, "SPY"),
         makePanel("m-chart-4", "chart", "Chart 4", 9, 0, 3, 5, "QQQ"),
         makePanel("m-pulse", "market-pulse", "Market Pulse", 0, 5, 8, 5),

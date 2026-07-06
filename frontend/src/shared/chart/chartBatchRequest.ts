@@ -15,7 +15,7 @@ export function supportsExtendedHoursRequest(slot: ChartSlot): boolean {
 }
 
 export function buildChartBatchRequestKey(slot: ChartSlot): string {
-  const market = slot.market === "IN" ? "NSE" : "NASDAQ";
+  const market = slot.market === "RU" ? "MOEX" : "NASDAQ";
   const extended = slot.extendedHours.enabled && supportsExtendedHoursRequest(slot);
   return `${slot.id}|${market}|${String(slot.ticker ?? "").toUpperCase()}|${BATCH_TIMEFRAME_MAP[slot.timeframe]}|ext=${extended}`;
 }

@@ -6,8 +6,8 @@ interface Preset {
 }
 
 const INDIA_PRESETS: Preset[] = [
-  { label: "NIFTY", underlying: "NIFTY 50", exchange: "NFO", strikeStep: 50 },
-  { label: "BANKNIFTY", underlying: "NIFTY BANK", exchange: "NFO", strikeStep: 100 },
+  { label: "IMOEX", underlying: "NIFTY 50", exchange: "NFO", strikeStep: 50 },
+  { label: "MOEX10", underlying: "NIFTY BANK", exchange: "NFO", strikeStep: 100 },
   {
     label: "FINNIFTY",
     underlying: "NIFTY FIN SERVICE",

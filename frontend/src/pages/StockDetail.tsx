@@ -70,9 +70,9 @@ function intervalToTimeframe(interval: string): ChartTimeframe {
   return "1D";
 }
 
-function normalizeRealtimeMarketCode(value: string): "NSE" | "NASDAQ" {
+function normalizeRealtimeMarketCode(value: string): "MOEX" | "NASDAQ" {
   const raw = String(value || "").trim().toUpperCase();
-  if (raw === "NSE" || raw === "BSE" || raw === "IN") return "NSE";
+  if (raw === "MOEX" || raw === "MOEX" || raw === "RU") return "MOEX";
   return "NASDAQ";
 }
 

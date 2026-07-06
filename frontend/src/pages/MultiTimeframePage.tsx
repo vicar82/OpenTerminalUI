@@ -135,12 +135,12 @@ const PANEL_CROSSHAIR_COLORS: Record<PanelRole, string> = {
 };
 const INDICATOR_PERIODS: IndicatorPeriod[] = [20, 50, 200];
 
-function marketToDropdown(value: string): "IN" | "US" {
-  return value === "NSE" || value === "BSE" ? "IN" : "US";
+function marketToDropdown(value: string): "RU" | "US" {
+  return value === "MOEX" || value === "MOEX" ? "RU" : "US";
 }
 
-function marketToApi(value: string): "NSE" | "NASDAQ" {
-  return value === "NSE" || value === "BSE" ? "NSE" : "NASDAQ";
+function marketToApi(value: string): "MOEX" | "NASDAQ" {
+  return value === "MOEX" || value === "MOEX" ? "MOEX" : "NASDAQ";
 }
 
 function formatPrice(value: number | null): string {

@@ -14,12 +14,12 @@ function fmt(value?: number | null): string {
 export function HomePage() {
   const navigate = useNavigate();
   const { data: marketStatus } = useMarketStatus();
-  const { subscribe, unsubscribe } = useQuotesStream("NSE");
+  const { subscribe, unsubscribe } = useQuotesStream("MOEX");
   const ticks = useQuotesStore((s) => s.ticksByToken);
 
   useEffect(() => {
-    subscribe(["NIFTY", "BANKNIFTY", "INDIAVIX"]);
-    return () => unsubscribe(["NIFTY", "BANKNIFTY", "INDIAVIX"]);
+    subscribe(["IMOEX", "MOEX10", "RUVIX"]);
+    return () => unsubscribe(["IMOEX", "MOEX10", "RUVIX"]);
   }, [subscribe, unsubscribe]);
 
   useEffect(() => {
@@ -43,7 +43,7 @@ export function HomePage() {
     marketState?: Array<{ marketStatus?: string }>;
     nifty50?: number | null;
     nifty50Pct?: number | null;
-    usdInr?: number | null;
+    usdRub?: number | null;
   } | undefined;
 
   const marketOpen = String(statusPayload?.marketState?.[0]?.marketStatus || "").toUpperCase() === "OPEN";

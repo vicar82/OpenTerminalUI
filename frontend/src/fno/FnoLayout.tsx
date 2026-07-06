@@ -23,10 +23,10 @@ const LINKS = [
   { to: "/fno/about", label: "About", key: "F9" },
 ] as const;
 
-const POPULAR_FNO_INDICES = ["NIFTY", "BANKNIFTY", "FINNIFTY", "MIDCPNIFTY", "NIFTYNXT50"] as const;
+const POPULAR_FNO_INDICES = ["IMOEX", "MOEX10", "FINNIFTY", "MIDCPNIFTY", "NIFTYNXT50"] as const;
 const FNO_SYMBOL_KEY = "fno:selectedSymbol";
 
-function FnoRightRail({ symbol, expiry, expiries, market }: { symbol: string; expiry: string; expiries: string[]; market: "NSE" | "US" }) {
+function FnoRightRail({ symbol, expiry, expiries, market }: { symbol: string; expiry: string; expiries: string[]; market: "MOEX" | "US" }) {
   const location = useLocation();
 
   return (
@@ -112,21 +112,21 @@ export function FnoLayout() {
   const [symbol, setSymbol] = useState<string>(() => {
     try {
       const raw = localStorage.getItem(FNO_SYMBOL_KEY);
-      const value = (raw || "NIFTY").trim().toUpperCase();
-      return value || "NIFTY";
+      const value = (raw || "IMOEX").trim().toUpperCase();
+      return value || "IMOEX";
     } catch {
-      return "NIFTY";
+      return "IMOEX";
     }
   });
   const [expiry, setExpiry] = useState<string>("");
-  const [market, setMarket] = useState<"NSE" | "US">("NSE");
+  const [market, setMarket] = useState<"MOEX" | "US">("MOEX");
   const symbolUniverse = useMemo(() => new Set((DEFAULT_FNO_SYMBOLS as readonly string[]).map((s) => s.toUpperCase())), []);
   const setSelectedCountry = useSettingsStore((s) => s.setSelectedCountry);
 
   useEffect(() => {
     if (symbol.endsWith(".NS") || symbolUniverse.has(symbol)) {
-      setMarket("NSE");
-      setSelectedCountry("IN");
+      setMarket("MOEX");
+      setSelectedCountry("RU");
     } else if (/^[A-Z]{1,5}$/.test(symbol)) {
       setMarket("US");
       setSelectedCountry("US");
@@ -152,7 +152,7 @@ export function FnoLayout() {
       setSymbol(incoming);
       return;
     }
-    setSymbol("NIFTY");
+    setSymbol("IMOEX");
   }, [searchParams, symbolUniverse]);
 
   const expiryQuery = useQuery({

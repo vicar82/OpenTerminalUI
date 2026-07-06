@@ -134,7 +134,7 @@ type Snapshot = {
 const num = (v: unknown): number | null => (typeof v === "number" && Number.isFinite(v) ? v : null);
 
 function compactMoney(value: number, currency: string): string {
-  const sym = currency === "INR" ? "₹" : currency === "USD" ? "$" : "";
+  const sym = currency === "RUB" ? "₹" : currency === "USD" ? "$" : "";
   const abs = Math.abs(value);
   const units: [number, string][] = [
     [1e12, "T"],
@@ -149,7 +149,7 @@ function compactMoney(value: number, currency: string): string {
 }
 
 function asCurrency(value: number, currency: string): string {
-  return currency === "INR" || currency === "USD"
+  return currency === "RUB" || currency === "USD"
     ? formatMoney(value, currency)
     : `${value.toFixed(2)}`;
 }

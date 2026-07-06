@@ -60,7 +60,7 @@ describe("shared home widgets", () => {
         selectedItemId="nifty"
         onSelect={onSelect}
         items={[
-          { id: "nifty", label: "NIFTY", value: 22400.5, changePct: 0.42 },
+          { id: "nifty", label: "IMOEX", value: 22400.5, changePct: 0.42 },
           { id: "vix", label: "VIX", value: 14.2, changePct: -1.12 },
         ]}
       />,
@@ -160,7 +160,7 @@ describe("shared home widgets", () => {
       <LiveClockStrip
         now={new Date("2026-01-15T12:00:00.000Z")}
         zones={[
-          { id: "ist", label: "IST", timeZone: "Asia/Kolkata" },
+          { id: "ist", label: "IST", timeZone: "Europe/Moscow" },
           { id: "utc", label: "UTC", timeZone: "UTC" },
         ]}
       />,

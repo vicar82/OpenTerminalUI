@@ -31,45 +31,39 @@ class AppSettings(BaseModel):
     fred_api_key: str | None = None
     fmp_api_key: str | None = None
     finnhub_api_key: str | None = None
-    ai_provider: str = "openai"  # openai or ollama
+    ai_provider: str = "ollama"  # openai | ollama
     openai_api_key: str | None = None
     ollama_base_url: str = "http://localhost:11434"
+    ollama_model: str = "llama3"
+    ollama_api_key: str | None = None
     lm_studio_base_url: str = "http://localhost:1234/v1"
     lm_studio_model: str = "google/gemma-4-26b-a4b"
     lm_studio_enabled: bool = True
     lm_studio_timeout_seconds: float = 240.0
     # Agent framework (multi-provider LLM)
-    agent_provider: str = "openrouter"  # openrouter | openai | lmstudio
-    # Default to a free OpenRouter model. Override via AGENT_MODEL / config.
-    agent_model: str = "openai/gpt-oss-20b:free"
-    # Free-only fallback chain tried in order when the primary model is
-    # rate-limited (429) or unavailable (404). All entries must be ":free".
+    agent_provider: str = "ollama"  # openrouter | openai | lmstudio | ollama
+    # Default agent model. For local Ollama use a model id known to your server.
+    agent_model: str = "llama3"
+    # Fallback chain tried when the primary model is unavailable. For Ollama
+    # this should list models you have pulled locally.
     agent_fallback_models: list[str] = Field(
         default_factory=lambda: [
-            "openai/gpt-oss-20b:free",
-            "qwen/qwen3-coder:free",
-            "meta-llama/llama-3.3-70b-instruct:free",
+            "llama3",
         ]
     )
     agent_models_tool_use: list[str] = Field(
         default_factory=lambda: [
-            "meta-llama/llama-3.3-70b-instruct:free",
-            "qwen/qwen3-coder:free",
-            "openai/gpt-oss-20b:free",
+            "llama3",
         ]
     )
     agent_models_reasoning: list[str] = Field(
         default_factory=lambda: [
-            "deepseek/deepseek-r1:free",
-            "qwen/qwq-32b:free",
-            "openai/gpt-oss-120b:free",
-            "openai/gpt-oss-20b:free",
+            "llama3",
         ]
     )
     agent_models_general: list[str] = Field(
         default_factory=lambda: [
-            "openai/gpt-oss-20b:free",
-            "google/gemini-2.0-flash-exp:free",
+            "llama3",
         ]
     )
     agent_max_steps: int = 12
@@ -244,6 +238,16 @@ def get_settings() -> AppSettings:
             or _env("OLLAMA_BASE_URL")
             or app_cfg.get("ollama_base_url", "http://localhost:11434")
         ),
+        ollama_model=(
+            _env("OPENTERMINALUI_OLLAMA_MODEL")
+            or _env("OLLAMA_MODEL")
+            or app_cfg.get("ollama_model", "llama3")
+        ),
+        ollama_api_key=(
+            _env("OPENTERMINALUI_OLLAMA_API_KEY")
+            or _env("OLLAMA_API_KEY")
+            or app_cfg.get("ollama_api_key")
+        ),
         lm_studio_base_url=(
             _env("OPENTERMINALUI_LM_STUDIO_BASE_URL")
             or _env("LM_STUDIO_BASE_URL")
@@ -267,12 +271,12 @@ def get_settings() -> AppSettings:
         agent_provider=(
             _env("OPENTERMINALUI_AGENT_PROVIDER")
             or _env("AGENT_PROVIDER")
-            or app_cfg.get("agent_provider", "openrouter")
+            or app_cfg.get("agent_provider", "ollama")
         ),
         agent_model=(
             _env("OPENTERMINALUI_AGENT_MODEL")
             or _env("AGENT_MODEL")
-            or app_cfg.get("agent_model", "openai/gpt-oss-20b:free")
+            or app_cfg.get("agent_model", "llama3")
         ),
         agent_fallback_models=(
             _parse_cors_env(_env("AGENT_FALLBACK_MODELS"))

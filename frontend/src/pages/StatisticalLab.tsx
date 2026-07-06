@@ -77,7 +77,7 @@ export function StatisticalLab() {
 
   // --- Regression State ---
   const [regTicker, setRegTicker] = useState("RELIANCE");
-  const [regBenchmark, setRegBenchmark] = useState("^NSEI");
+  const [regBenchmark, setRegBenchmark] = useState("IMOEX");
   const [regWindow, setRegWindow] = useState(63);
 
   // --- Autocorr State ---

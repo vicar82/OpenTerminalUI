@@ -41,7 +41,7 @@ export function useBatchChartData(slots: ChartSlot[]): Result {
           symbol: slot.ticker!.toUpperCase(),
           interval: BATCH_TIMEFRAME_MAP[slot.timeframe],
           range: "1y",
-          market: slot.market === "IN" ? "NSE" : "NASDAQ",
+          market: slot.market === "RU" ? "MOEX" : "NASDAQ",
           extended: slot.extendedHours.enabled && supportsExtendedHoursRequest(slot),
         })),
     [requestSignature],

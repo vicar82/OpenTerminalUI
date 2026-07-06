@@ -277,7 +277,7 @@ function InfoCard({ label, value, accent = false, testId }: { label: string; val
 export function PositionSizerPage() {
   const displayCurrency = useSettingsStore((state) => state.displayCurrency);
   const selectedCountry = useSettingsStore((state) => state.selectedCountry);
-  const locale = selectedCountry === "IN" ? "en-IN" : "en-US";
+  const locale = selectedCountry === "RU" ? "en-IN" : "en-US";
   const currency = displayCurrency;
 
   const [inputs, setInputs] = useState<PositionSizerInputs>(DEFAULT_INPUTS);

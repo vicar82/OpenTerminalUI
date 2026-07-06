@@ -32,7 +32,7 @@ export async function getHistory(
       return {
         ticker: symbol.toUpperCase(),
         interval,
-        currency: market.toUpperCase() === "NSE" || market.toUpperCase() === "BSE" ? "INR" : "USD",
+        currency: market.toUpperCase() === "MOEX" || market.toUpperCase() === "MOEX" ? "RUB" : "USD",
         data: (Array.isArray(unified.data) ? unified.data : []).map((row) => ({
           t: Math.floor(Number(row.t) / 1000),
           o: Number(row.o),
@@ -86,7 +86,7 @@ export async function searchSymbols(q: string, market: string): Promise<SearchSy
   return data.results;
 }
 
-export async function fetchChart(ticker: string, interval = "1d", range = "1y", market = "NSE"): Promise<ChartResponse> {
+export async function fetchChart(ticker: string, interval = "1d", range = "1y", market = "MOEX"): Promise<ChartResponse> {
   return getHistory(ticker, market, interval, range);
 }
 
@@ -98,7 +98,7 @@ export async function fetchChartsBatchWithMeta(
       symbol: item.symbol.trim().toUpperCase(),
       interval: item.interval ?? "1d",
       range: item.range ?? "1y",
-      market: (item.market ?? "NSE").trim().toUpperCase(),
+      market: (item.market ?? "MOEX").trim().toUpperCase(),
       extended: !!item.extended,
     }))
     .filter((item) => Boolean(item.symbol));
@@ -138,15 +138,15 @@ export async function fetchChartsBatch(
   return result.data;
 }
 
-export async function fetchStock(ticker: string, market = "NSE"): Promise<StockSnapshot> {
+export async function fetchStock(ticker: string, market = "MOEX"): Promise<StockSnapshot> {
   return getQuote(ticker, market);
 }
 
-export async function searchStocks(q: string, market = "NSE"): Promise<SearchSymbolItem[]> {
+export async function searchStocks(q: string, market = "MOEX"): Promise<SearchSymbolItem[]> {
   return searchSymbols(q, market);
 }
 
-export async function fetchDepth(symbol: string, market = "NSE", levels = 20): Promise<DepthSnapshotResponse> {
+export async function fetchDepth(symbol: string, market = "MOEX", levels = 20): Promise<DepthSnapshotResponse> {
   const { data } = await api.get<DepthSnapshotResponse>(`/depth/${encodeURIComponent(symbol)}`, {
     params: { market, levels },
   });

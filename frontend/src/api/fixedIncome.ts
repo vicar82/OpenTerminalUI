@@ -22,7 +22,7 @@ export async function fetchBondRatingsMigration(): Promise<RatingsMigrationItem[
   return Array.isArray(data?.items) ? data.items : [];
 }
 
-export async function fetchYieldCurve(country = "IN"): Promise<YieldCurveResponse> {
+export async function fetchYieldCurve(country = "RU"): Promise<YieldCurveResponse> {
   const { data } = await api.get<YieldCurveResponse>("/fixed-income/yield-curve", { params: { country } });
   return data;
 }

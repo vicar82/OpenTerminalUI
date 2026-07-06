@@ -178,9 +178,9 @@ describe("AccountPage revamp", () => {
     fireEvent.change(screen.getByLabelText("Trading Style"), { target: { value: "systematic" } });
     fireEvent.change(screen.getByLabelText("Notification Mode"), { target: { value: "quiet" } });
     fireEvent.change(screen.getByLabelText("Security Tier"), { target: { value: "standard" } });
-    fireEvent.change(screen.getByLabelText("Preferred Country"), { target: { value: "IN" } });
-    fireEvent.change(screen.getByLabelText("Preferred Exchange"), { target: { value: "BSE" } });
-    fireEvent.change(screen.getByLabelText("Default Currency"), { target: { value: "INR" } });
+    fireEvent.change(screen.getByLabelText("Preferred Country"), { target: { value: "RU" } });
+    fireEvent.change(screen.getByLabelText("Preferred Exchange"), { target: { value: "MOEX" } });
+    fireEvent.change(screen.getByLabelText("Default Currency"), { target: { value: "RUB" } });
     fireEvent.change(screen.getByLabelText("Webhook URL"), { target: { value: "https://hooks.example.dev/macro" } });
 
     fireEvent.click(screen.getByRole("button", { name: "Save account details" }));
@@ -203,9 +203,9 @@ describe("AccountPage revamp", () => {
     );
     expect(storedConnection).toEqual(
       expect.objectContaining({
-        preferredCountry: "IN",
-        preferredExchange: "BSE",
-        defaultCurrency: "INR",
+        preferredCountry: "RU",
+        preferredExchange: "MOEX",
+        defaultCurrency: "RUB",
       }),
     );
     expect(storedAggregators).toEqual(
@@ -213,9 +213,9 @@ describe("AccountPage revamp", () => {
         webhookUrl: "https://hooks.example.dev/macro",
       }),
     );
-    expect(setSelectedCountrySpy).toHaveBeenCalledWith("IN");
-    expect(setSelectedMarketSpy).toHaveBeenCalledWith("BSE");
-    expect(setDisplayCurrencySpy).toHaveBeenCalledWith("INR");
+    expect(setSelectedCountrySpy).toHaveBeenCalledWith("RU");
+    expect(setSelectedMarketSpy).toHaveBeenCalledWith("MOEX");
+    expect(setDisplayCurrencySpy).toHaveBeenCalledWith("RUB");
     expect(await screen.findByText("Account details saved.")).toBeInTheDocument();
   });
 

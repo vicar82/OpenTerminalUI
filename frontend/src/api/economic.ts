@@ -9,7 +9,7 @@ export async function fetchEconomicCalendar(from: string, to: string): Promise<E
   return Array.isArray(data?.items) ? data.items : [];
 }
 
-export async function fetchMacroIndicators(country = "IN"): Promise<MacroIndicatorsResponse> {
+export async function fetchMacroIndicators(country = "RU"): Promise<MacroIndicatorsResponse> {
   const { data } = await api.get<MacroIndicatorsResponse>("/economics/indicators", { params: { country } });
   return data;
 }

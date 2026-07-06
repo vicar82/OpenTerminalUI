@@ -22,7 +22,7 @@ function pct(value: number): string {
 function classifyCurrency(item: PortfolioItem, market: string): string {
   const exchange = (item.exchange || "").toUpperCase();
   const country = (item.country_code || "").toUpperCase();
-  if (exchange.includes("NSE") || exchange.includes("BSE") || country === "IN" || market === "NSE" || market === "BSE") return "INR";
+  if (exchange.includes("MOEX") || exchange.includes("MOEX") || country === "RU" || market === "MOEX" || market === "MOEX") return "RUB";
   return "USD";
 }
 
@@ -47,7 +47,7 @@ function currencyCells(items: PortfolioItem[], market: string): ExposureCell[] {
   return [...byCurrency.entries()].map(([label, value]) => ({
     label,
     value: total > 0 ? (value / total) * 100 : 0,
-    context: label === "INR" ? "India" : "US",
+    context: label === "RUB" ? "India" : "US",
     tone: "neutral" as const,
   }));
 }

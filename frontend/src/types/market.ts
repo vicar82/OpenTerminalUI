@@ -1,6 +1,6 @@
 /** Shared market data types — mirrors backend Pydantic/dataclass shapes. */
 
-export type Exchange = "NSE" | "BSE" | "NFO" | "NYSE" | "NASDAQ" | "CME" | "AMEX";
+export type Exchange = "MOEX" | "MOEX" | "NFO" | "NYSE" | "NASDAQ" | "CME" | "AMEX";
 
 export type Segment = "EQ" | "FUT" | "OPT" | "IDX" | "ETF";
 

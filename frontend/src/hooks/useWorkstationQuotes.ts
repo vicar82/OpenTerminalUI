@@ -10,7 +10,7 @@ export function useWorkstationQuotes(slots: ChartSlot[]) {
   const nseSymbols = useMemo(
     () =>
       slots
-        .filter((s) => s.ticker && s.market === "IN")
+        .filter((s) => s.ticker && s.market === "RU")
         .map((s) => normalizeSymbol(s.ticker!)),
     [slots],
   );
@@ -22,7 +22,7 @@ export function useWorkstationQuotes(slots: ChartSlot[]) {
     [slots],
   );
 
-  const nse = useQuotesStream("NSE");
+  const nse = useQuotesStream("MOEX");
   const us = useQuotesStream("NASDAQ");
   const ticksByToken = useQuotesStore((s) => s.ticksByToken);
   const { subscribe: subscribeNse, unsubscribe: unsubscribeNse } = nse;
@@ -47,7 +47,7 @@ export function useWorkstationQuotes(slots: ChartSlot[]) {
         out[slot.id] = null;
         continue;
       }
-      const market = slot.market === "IN" ? "NSE" : "NASDAQ";
+      const market = slot.market === "RU" ? "MOEX" : "NASDAQ";
       out[slot.id] = ticksByToken[`${market}:${normalizeSymbol(slot.ticker)}`] ?? null;
     }
     return out;

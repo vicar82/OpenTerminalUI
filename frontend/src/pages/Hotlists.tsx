@@ -4,7 +4,7 @@ import { useNavigate } from "react-router-dom";
 import { DenseTable, type DenseTableColumn } from "../components/terminal/DenseTable";
 
 type HotlistType = "gainers" | "losers" | "most_active" | "52w_high" | "52w_low" | "gap_up" | "gap_down" | "unusual_volume";
-type HotlistMarket = "IN" | "US";
+type HotlistMarket = "RU" | "US";
 
 type HotlistItem = {
   symbol: string;
@@ -39,8 +39,8 @@ const HOTLIST_TABS: Array<{ id: HotlistType; label: string }> = [
 ];
 
 function isMarketHours(market: HotlistMarket): boolean {
-  const locale = market === "IN" ? "en-IN" : "en-US";
-  const tz = market === "IN" ? "Asia/Kolkata" : "America/New_York";
+  const locale = market === "RU" ? "en-IN" : "en-US";
+  const tz = market === "RU" ? "Europe/Moscow" : "America/New_York";
   const parts = new Intl.DateTimeFormat(locale, {
     timeZone: tz,
     weekday: "short",
@@ -53,7 +53,7 @@ function isMarketHours(market: HotlistMarket): boolean {
   const hour = Number(parts.find((part) => part.type === "hour")?.value ?? "0");
   const minute = Number(parts.find((part) => part.type === "minute")?.value ?? "0");
   const mins = hour * 60 + minute;
-  if (market === "IN") return mins >= 555 && mins <= 930;
+  if (market === "RU") return mins >= 555 && mins <= 930;
   return mins >= 570 && mins <= 960;
 }
 
@@ -72,7 +72,7 @@ function toRow(item: HotlistItem, index: number): HotlistRow {
 
 export function HotlistsPage() {
   const navigate = useNavigate();
-  const [market, setMarket] = useState<HotlistMarket>("IN");
+  const [market, setMarket] = useState<HotlistMarket>("RU");
   const [listType, setListType] = useState<HotlistType>("gainers");
   const [rows, setRows] = useState<HotlistRow[]>([]);
   const [loading, setLoading] = useState(true);
@@ -186,8 +186,8 @@ export function HotlistsPage() {
         <div className="inline-flex items-center gap-1 rounded border border-terminal-border bg-terminal-panel p-1 text-[10px] uppercase tracking-[0.12em]">
           <button
             type="button"
-            className={`rounded px-2 py-1 ${market === "IN" ? "bg-terminal-accent/20 text-terminal-accent" : "text-terminal-muted hover:text-terminal-text"}`}
-            onClick={() => setMarket("IN")}
+            className={`rounded px-2 py-1 ${market === "RU" ? "bg-terminal-accent/20 text-terminal-accent" : "text-terminal-muted hover:text-terminal-text"}`}
+            onClick={() => setMarket("RU")}
           >
             IN
           </button>

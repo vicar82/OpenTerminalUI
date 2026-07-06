@@ -26,7 +26,7 @@ export type StrikeData = {
 
 export type OptionChainResponse = {
   symbol: string;
-  market?: "US" | "NSE";
+  market?: "US" | "MOEX";
   spot_price: number;
   timestamp: string;
   expiry_date: string;
@@ -65,7 +65,7 @@ export type OIAnalysis = {
 
 export type ChainSummary = {
   symbol: string;
-  market?: "US" | "NSE";
+  market?: "US" | "MOEX";
   expiry_date: string;
   spot_price: number;
   atm_strike: number;
@@ -201,8 +201,8 @@ export type OptionsFlowSummary = {
 };
 
 export const DEFAULT_FNO_SYMBOLS = [
-  "NIFTY",
-  "BANKNIFTY",
+  "IMOEX",
+  "MOEX10",
   "RELIANCE",
   "TCS",
   "INFY",

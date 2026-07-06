@@ -31,7 +31,7 @@ type PairResponse = {
 };
 
 const API_BASE = (import.meta.env.VITE_API_BASE_URL || "/api").replace(/\/$/, "") || "/api";
-const FALLBACK_CURRENCIES = ["USD", "EUR", "GBP", "JPY", "CHF", "AUD", "CAD", "INR"];
+const FALLBACK_CURRENCIES = ["USD", "EUR", "GBP", "JPY", "CHF", "AUD", "CAD", "RUB"];
 const USD_QUOTE_RATES: Record<string, number> = {
   USD: 1,
   EUR: 0.9231,
@@ -50,7 +50,7 @@ const FALLBACK_BANKS: CentralBankEntry[] = [
   { currency: "CHF", bank: "Swiss National Bank", policy_rate: 1.25, last_decision_date: "2026-03-14", next_decision_date: "2026-06-13", last_action: "Hold", last_change_bps: 0, days_since_last_decision: 5, days_until_next_decision: 86, decision_cycle: "Quarterly" },
   { currency: "AUD", bank: "Reserve Bank of Australia", policy_rate: 4.1, last_decision_date: "2026-03-03", next_decision_date: "2026-04-07", last_action: "Hold", last_change_bps: 0, days_since_last_decision: 16, days_until_next_decision: 18, decision_cycle: "Monthly" },
   { currency: "CAD", bank: "Bank of Canada", policy_rate: 4.0, last_decision_date: "2026-03-12", next_decision_date: "2026-04-23", last_action: "Cut", last_change_bps: -25, days_since_last_decision: 7, days_until_next_decision: 34, decision_cycle: "6 weeks" },
-  { currency: "INR", bank: "Reserve Bank of India", policy_rate: 6.5, last_decision_date: "2026-02-07", next_decision_date: "2026-04-05", last_action: "Hold", last_change_bps: 0, days_since_last_decision: 41, days_until_next_decision: 16, decision_cycle: "Bi-monthly" },
+  { currency: "RUB", bank: "Reserve Bank of India", policy_rate: 6.5, last_decision_date: "2026-02-07", next_decision_date: "2026-04-05", last_action: "Hold", last_change_bps: 0, days_since_last_decision: 41, days_until_next_decision: 16, decision_cycle: "Bi-monthly" },
 ];
 
 function clamp(value: number, min: number, max: number): number {

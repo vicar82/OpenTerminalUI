@@ -8,8 +8,8 @@ describe("agent UI polish", () => {
     const data = {
       ticker: "RELIANCE", company_name: "RELIANCE INDUSTRIES LTD", current_price: 1309.5,
       change_pct: -1.4, market_cap: 17720772919296, pe: 21.93, roe_pct: 9.14,
-      rev_growth_pct: 12.5, eps_growth_pct: -12.6, sector: "Energy", exchange: "NSE",
-      currency: "INR", flag_emoji: "🇮🇳",
+      rev_growth_pct: 12.5, eps_growth_pct: -12.6, sector: "Energy", exchange: "MOEX",
+      currency: "RUB", flag_emoji: "🇮🇳",
     };
     render(<ArtifactView artifact={{ id: "a1", kind: "snapshot_card", name: "RELIANCE", data }} />);
     expect(screen.getByText("RELIANCE INDUSTRIES LTD")).toBeTruthy();

@@ -1,15 +1,11 @@
 default:
-  primary: kite
+  primary: yahoo
   fallback:
-    - yahoo
+    - moex
 
 exchanges:
-  NSE:
-    primary: kite
-    fallback:
-      - yahoo
-  BSE:
-    primary: kite
+  MOEX:
+    primary: moex
     fallback:
       - yahoo
   NASDAQ:

@@ -93,7 +93,7 @@ function normalizeSymbol(symbol: string): string {
 
 function resolveAlertMarketToken(market: string): string {
   const normalized = String(market || "").trim().toUpperCase();
-  if (normalized === "IN" || normalized === "NSE" || normalized === "BSE") return "NSE";
+  if (normalized === "RU" || normalized === "MOEX" || normalized === "MOEX") return "MOEX";
   if (normalized === "US" || normalized === "NASDAQ" || normalized === "NYSE" || normalized === "AMEX") return "NASDAQ";
   return normalized || "UNKNOWN";
 }
