@@ -160,7 +160,7 @@ def metrics_lite() -> dict[str, object]:
         "scanner_alert_last_run": scanner_status.get("last_run_at"),
         "scanner_alert_last_status": scanner_status.get("last_status"),
         "scanner_alert_scanned_symbols": scanner_status.get("last_scanned_symbols"),
-        "last_kite_stream_status": hub.kite_stream_status(),
+        "last_moex_stream_status": "polling",
     }
 
 

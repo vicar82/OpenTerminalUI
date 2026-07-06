@@ -71,78 +71,9 @@ class InstrumentsLoader:
         logger.info("Instruments loader stopped")
 
     async def refresh_once(self) -> bool:
-        fetcher = await get_unified_fetcher()
-        kite_client = fetcher.kite
-
-        if not kite_client.api_key:
-            logger.info("Futures instruments refresh skipped: Kite API key missing")
-            return False
-        access_token = kite_client.resolve_access_token()
-        if not access_token:
-            logger.info("Futures instruments refresh skipped: Kite access token missing")
-            return False
-
-        try:
-            from kiteconnect import KiteConnect  # type: ignore
-        except Exception as exc:
-            logger.warning("Futures instruments refresh skipped: kiteconnect unavailable (%s)", exc)
-            return False
-
-        def _fetch_rows() -> list[FutureContractRow]:
-            kc = KiteConnect(api_key=kite_client.api_key)
-            kc.set_access_token(access_token)
-            items = kc.instruments(exchange="NFO")
-            now_iso = _utc_now_iso()
-            rows: list[FutureContractRow] = []
-            for item in items:
-                segment = str(item.get("segment") or "").upper()
-                instrument_type = str(item.get("instrument_type") or "").upper()
-                if not segment.startswith("NFO") or instrument_type != "FUT":
-                    continue
-
-                underlying = str(item.get("name") or "").strip().upper()
-                tradingsymbol = str(item.get("tradingsymbol") or "").strip().upper()
-                exchange = str(item.get("exchange") or "NFO").strip().upper() or "NFO"
-                expiry_date = _to_iso_date(item.get("expiry"))
-                token = item.get("instrument_token")
-                if not underlying or not tradingsymbol or not expiry_date or not isinstance(token, int):
-                    continue
-
-                lot_size_raw = item.get("lot_size")
-                tick_size_raw = item.get("tick_size")
-                lot_size = int(lot_size_raw) if isinstance(lot_size_raw, (int, float)) else 0
-                tick_size = float(tick_size_raw) if isinstance(tick_size_raw, (int, float)) else 0.0
-                rows.append(
-                    FutureContractRow(
-                        underlying=underlying,
-                        expiry_date=expiry_date,
-                        exchange=exchange,
-                        tradingsymbol=tradingsymbol,
-                        instrument_token=token,
-                        lot_size=lot_size,
-                        tick_size=tick_size,
-                        updated_at=now_iso,
-                    )
-                )
-            return rows
-
-        try:
-            rows = await asyncio.to_thread(_fetch_rows)
-        except Exception as exc:
-            logger.warning("Futures instruments refresh failed during fetch: %s", exc)
-            return False
-
-        if not rows:
-            logger.warning("Futures instruments refresh returned no FUT rows")
-            return False
-
-        try:
-            await asyncio.to_thread(self._upsert_rows, rows)
-            logger.info("Futures instruments refresh completed with %s rows", len(rows))
-            return True
-        except Exception as exc:
-            logger.warning("Futures instruments refresh failed during upsert: %s", exc)
-            return False
+        """Placeholder refresh: MOEX futures are not loaded via Kite/NFO."""
+        logger.info("Futures instruments refresh skipped: MOEX futures loader not implemented")
+        return False
 
     async def _loop(self) -> None:
         while not self._stop_event.is_set():

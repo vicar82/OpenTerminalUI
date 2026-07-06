@@ -35,7 +35,7 @@ async def feed_health(_: User = Depends(get_current_user)) -> dict[str, Any]:
         "feed_state": freshness_state,
         "ws_connected_clients": ws_clients,
         "ws_subscriptions": ws_subs,
-        "kite_stream_status": hub.kite_stream_status(),
+        "moex_stream_status": "polling",
         "us_provider_health": us_stream.provider_health_snapshot(),
         "us_primary_provider": us_stream.primary_provider_name(),
         "timestamp": datetime.now(timezone.utc).isoformat(),

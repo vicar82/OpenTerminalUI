@@ -29,8 +29,7 @@ class StockClassification(BaseModel):
 
 
 EXCHANGE_COUNTRY_MAP = {
-    "NSE": {"country_code": "IN", "country_name": "India", "flag_emoji": "🇮🇳", "currency": "INR"},
-    "BSE": {"country_code": "IN", "country_name": "India", "flag_emoji": "🇮🇳", "currency": "INR"},
+    "MOEX": {"country_code": "RU", "country_name": "Russia", "flag_emoji": "🇷🇺", "currency": "RUB"},
     "NYSE": {"country_code": "US", "country_name": "United States", "flag_emoji": "🇺🇸", "currency": "USD"},
     "NASDAQ": {"country_code": "US", "country_name": "United States", "flag_emoji": "🇺🇸", "currency": "USD"},
     "AMEX": {"country_code": "US", "country_name": "United States", "flag_emoji": "🇺🇸", "currency": "USD"},
@@ -44,8 +43,8 @@ EXCHANGE_COUNTRY_MAP = {
 }
 
 _US_EXCHANGES = {"NYSE", "NASDAQ", "AMEX"}
-_NSE_SYMBOLS: set[str] | None = None
-_NSE_LOCK = asyncio.Lock()
+_MOEX_SYMBOLS: set[str] | None = None
+_MOEX_LOCK = asyncio.Lock()
 
 
 def _country_flag_emoji(country_code: str) -> str:
@@ -62,11 +61,15 @@ def _market_status_for_exchange(exchange: str) -> str:
     if weekday >= 5:
         return "closed"
 
-    if ex in {"NSE", "BSE"}:
-        local = now_utc.astimezone(ZoneInfo("Asia/Kolkata"))
+    if ex == "MOEX":
+        local = now_utc.astimezone(ZoneInfo("Europe/Moscow"))
         now_min = local.hour * 60 + local.minute
-        if 9 * 60 + 15 <= now_min <= 15 * 60 + 30:
+        if 10 * 60 <= now_min <= 18 * 60 + 50:
             return "open"
+        if 9 * 60 + 50 <= now_min < 10 * 60:
+            return "pre-market"
+        if 18 * 60 + 50 <= now_min < 19 * 60 + 5:
+            return "post-market"
         return "closed"
 
     if ex in _US_EXCHANGES:
@@ -95,15 +98,15 @@ class MarketClassifier:
     async def close(self) -> None:
         await self._http.aclose()
 
-    async def _load_nse_symbols(self) -> set[str]:
-        global _NSE_SYMBOLS
-        if _NSE_SYMBOLS is not None:
-            return _NSE_SYMBOLS
-        async with _NSE_LOCK:
-            if _NSE_SYMBOLS is not None:
-                return _NSE_SYMBOLS
+    async def _load_moex_symbols(self) -> set[str]:
+        global _MOEX_SYMBOLS
+        if _MOEX_SYMBOLS is not None:
+            return _MOEX_SYMBOLS
+        async with _MOEX_LOCK:
+            if _MOEX_SYMBOLS is not None:
+                return _MOEX_SYMBOLS
             data_dir = Path(__file__).resolve().parents[2] / "data"
-            files = [data_dir / "nse_equity_symbols_eq.csv", data_dir / "nse_equity_symbols_all.csv"]
+            files = [data_dir / "moex_equity_symbols.csv"]
             out: set[str] = set()
             for file_path in files:
                 if not file_path.exists():
@@ -112,20 +115,20 @@ class MarketClassifier:
                     with file_path.open("r", encoding="utf-8") as f:
                         rows = csv.DictReader(f)
                         for row in rows:
-                            symbol = (row.get("Symbol") or row.get("SYMBOL") or "").strip().upper()
+                            symbol = (row.get("SECID") or row.get("SYMBOL") or "").strip().upper()
                             if symbol:
                                 out.add(symbol)
                 except Exception:
                     continue
-            _NSE_SYMBOLS = out
-            return _NSE_SYMBOLS
+            _MOEX_SYMBOLS = out
+            return _MOEX_SYMBOLS
 
     async def _fetch_fmp_profile(self, symbol: str) -> dict[str, Any]:
         if not self._fmp_key:
             return {}
         candidates = [symbol]
         if "." not in symbol:
-            candidates.extend([f"{symbol}.NS", f"{symbol}.BO"])
+            candidates.append(f"{symbol}.ME")
         for cand in candidates:
             try:
                 resp = await self._http.get(
@@ -154,7 +157,7 @@ class MarketClassifier:
             }
         low = country_raw.lower()
         fallback: dict[str, tuple[str, str, str]] = {
-            "india": ("IN", "India", "INR"),
+            "russia": ("RU", "Russia", "RUB"),
             "united states": ("US", "United States", "USD"),
             "usa": ("US", "United States", "USD"),
             "united kingdom": ("GB", "United Kingdom", "GBP"),
@@ -168,10 +171,8 @@ class MarketClassifier:
         code, name, currency = fallback.get(low, ("US", country_raw or "Unknown", str(profile.get("currency") or "USD")))
         return {"country_code": code, "country_name": name, "flag_emoji": _country_flag_emoji(code), "currency": currency}
 
-    async def _has_indian_fo(self, symbol: str) -> bool:
+    async def _has_russian_fo(self, symbol: str) -> bool:
         base = symbol.strip().upper()
-        if base.endswith(".NS") or base.endswith(".BO"):
-            base = base.split(".", 1)[0]
 
         def _query() -> bool:
             db = SessionLocal()
@@ -202,24 +203,21 @@ class MarketClassifier:
         exchange = ""
         profile: dict[str, Any] = {}
 
-        if input_symbol.endswith(".NS"):
+        if input_symbol.endswith(".ME"):
             base_symbol = input_symbol[:-3]
-            exchange = "NSE"
-        elif input_symbol.endswith(".BO"):
-            base_symbol = input_symbol[:-3]
-            exchange = "BSE"
+            exchange = "MOEX"
 
         if not exchange:
-            nse_symbols = await self._load_nse_symbols()
-            if input_symbol in nse_symbols:
-                exchange = "NSE"
+            moex_symbols = await self._load_moex_symbols()
+            if input_symbol in moex_symbols:
+                exchange = "MOEX"
 
         if not exchange:
             profile = await self._fetch_fmp_profile(input_symbol)
             exchange = str(profile.get("exchangeShortName") or profile.get("exchange") or "").strip().upper()
 
         if not exchange:
-            exchange = "NSE" if input_symbol in (await self._load_nse_symbols()) else "NASDAQ"
+            exchange = "MOEX" if input_symbol in (await self._load_moex_symbols()) else "NASDAQ"
 
         ex_meta = EXCHANGE_COUNTRY_MAP.get(exchange)
         if ex_meta is None and profile:
@@ -233,8 +231,8 @@ class MarketClassifier:
             or base_symbol
         ).strip() or base_symbol
 
-        if ex_meta["country_code"] == "IN":
-            has_futures = await self._has_indian_fo(base_symbol)
+        if ex_meta["country_code"] == "RU":
+            has_futures = await self._has_russian_fo(base_symbol)
             has_options = has_futures
         elif exchange in _US_EXCHANGES:
             has_futures = False
@@ -264,12 +262,11 @@ class MarketClassifier:
         raw = symbol.strip().upper()
         if raw.startswith("^") or "=" in raw:
             return raw
-        if raw.endswith(".NS") or raw.endswith(".BO"):
+        if raw.endswith(".ME"):
             return raw
         cls = await self.classify(raw)
-        if cls.country_code == "IN":
-            suffix = ".BO" if cls.exchange == "BSE" else ".NS"
-            return f"{cls.symbol}{suffix}"
+        if cls.country_code == "RU":
+            return f"{cls.symbol}.ME"
         return cls.symbol
 
 

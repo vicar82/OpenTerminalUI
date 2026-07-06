@@ -7,13 +7,12 @@ from dataclasses import dataclass
 from datetime import datetime, timezone
 
 from backend.config.settings import get_settings
-from backend.core.kite_client import KiteClient
 from backend.db.base import sqlite_file_from_url
 from backend.shared.sqlite_utils import configure_sqlite_connection
 
 logger = logging.getLogger(__name__)
 
-SUPPORTED_EXCHANGES = {"NSE", "BSE", "NFO"}
+SUPPORTED_EXCHANGES = {"MOEX"}
 
 
 def _utc_now_iso() -> str:
@@ -67,85 +66,11 @@ class InstrumentMapService:
             )
             conn.commit()
 
-    async def refresh_if_stale(self, kite_client: KiteClient, force: bool = False) -> bool:
+    async def refresh_if_stale(self, _: object | None = None, force: bool = False) -> bool:
+        """Placeholder refresh: MOEX ISS does not require instrument-token mapping."""
         await self.initialize()
-        is_stale = await asyncio.to_thread(self._is_stale)
-        if not force and not is_stale:
-            return True
-        return await self._download_and_store(kite_client)
-
-    def _is_stale(self) -> bool:
-        with self._connect() as conn:
-            row = conn.execute("SELECT MAX(updated_at) FROM instrument_map").fetchone()
-            if not row or not row[0]:
-                return True
-            try:
-                last = datetime.fromisoformat(str(row[0]))
-            except ValueError:
-                return True
-            return last.date() != datetime.now(timezone.utc).date()
-
-    async def _download_and_store(self, kite_client: KiteClient) -> bool:
-        if not kite_client.api_key:
-            logger.info("Instrument map refresh skipped: Kite API key is missing")
-            return False
-        access_token = kite_client.resolve_access_token()
-        if not access_token:
-            logger.info("Instrument map refresh skipped: Kite access token is missing")
-            return False
-
-        try:
-            from kiteconnect import KiteConnect  # type: ignore
-        except Exception as exc:
-            logger.warning("Instrument map refresh skipped: kiteconnect unavailable (%s)", exc)
-            return False
-
-        def _fetch() -> list[InstrumentRow]:
-            kc = KiteConnect(api_key=kite_client.api_key)
-            kc.set_access_token(access_token)
-            now_iso = _utc_now_iso()
-            rows: list[InstrumentRow] = []
-            for exchange in sorted(SUPPORTED_EXCHANGES):
-                instruments = kc.instruments(exchange=exchange)
-                for item in instruments:
-                    symbol = str(item.get("tradingsymbol") or "").strip().upper()
-                    token = item.get("instrument_token")
-                    if not symbol or not isinstance(token, int):
-                        continue
-                    rows.append(
-                        InstrumentRow(
-                            exchange=exchange,
-                            symbol=symbol,
-                            token=token,
-                            tradingsymbol=symbol,
-                            updated_at=now_iso,
-                        )
-                    )
-            return rows
-
-        try:
-            rows = await asyncio.to_thread(_fetch)
-            if not rows:
-                logger.warning("Instrument map refresh returned no rows")
-                return False
-            await asyncio.to_thread(self._replace_rows, rows)
-            logger.info("Instrument map refreshed with %s rows", len(rows))
-            return True
-        except Exception as exc:
-            logger.warning("Instrument map refresh failed: %s", exc)
-            return False
-
-    def _replace_rows(self, rows: list[InstrumentRow]) -> None:
-        with self._connect() as conn:
-            conn.execute("DELETE FROM instrument_map")
-            conn.executemany(
-                """
-                INSERT INTO instrument_map(exchange, symbol, token, tradingsymbol, updated_at)
-                VALUES (?, ?, ?, ?, ?)
-                """,
-                [(r.exchange, r.symbol, r.token, r.tradingsymbol, r.updated_at) for r in rows],
-            )
-            conn.commit()
+        logger.info("Instrument map refresh skipped: MOEX uses symbol-native quotes")
+        return True
 
     async def resolve_many(self, symbols: list[str]) -> dict[str, int]:
         await self.initialize()

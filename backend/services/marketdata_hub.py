@@ -15,16 +15,13 @@ from backend.core.ttl_policy import market_open_now
 from backend.services.candle_aggregator import CandleAggregator
 from backend.services.finnhub_ws import FinnhubWebSocket
 from backend.services.instrument_map import get_instrument_map_service
-from backend.services.kite_stream import KiteStreamAdapter
 from backend.services.redis_quote_bus import get_quote_bus
 
 logger = logging.getLogger(__name__)
 
-SYMBOL_TOKEN_RE = re.compile(r"^(NSE|BSE|NFO|NYSE|NASDAQ):([A-Z0-9][A-Z0-9._-]{0,40})$")
+SYMBOL_TOKEN_RE = re.compile(r"^(MOEX|NYSE|NASDAQ):([A-Z0-9][A-Z0-9._-]{0,40})$")
 US_MARKETS = {"NYSE", "NASDAQ"}
-IN_MARKETS = {"NSE", "BSE", "NFO"}
-NFO_OPTION_RE = re.compile(r"^([A-Z]+)\d{2}[A-Z]{3}(\d+)(CE|PE)$")
-NFO_FUT_RE = re.compile(r"^([A-Z]+)\d{2}[A-Z]{3}FUT$")
+RU_MARKETS = {"MOEX"}
 
 
 def _now_iso() -> str:
@@ -83,13 +80,6 @@ class MarketDataHub:
         self._lock_task: asyncio.Task | None = None
 
         self._instrument_map = get_instrument_map_service()
-        self._kite_stream: KiteStreamAdapter | None = None
-        self._stream_sync_lock = asyncio.Lock()
-        self._stream_symbols_to_token: dict[str, int] = {}
-        self._stream_token_to_symbol: dict[int, str] = {}
-        self._nfo_fallback_poll_seconds = 30.0
-        self._nfo_chain_last_fetch: dict[str, float] = {}
-        self._nfo_quote_cache: dict[str, dict[str, Any]] = {}
         self._tick_listeners: list = []
         self._alert_connections: set[WebSocket] = set()
         self._candle_aggregator = CandleAggregator()
@@ -122,7 +112,7 @@ class MarketDataHub:
             await self._bus.connect()
 
             # Auto-subscribe to all supported markets
-            for m in list(US_MARKETS) + list(IN_MARKETS):
+            for m in list(US_MARKETS) + list(RU_MARKETS):
                 await self._bus.subscribe_market(m)
 
             self._poll_task = asyncio.create_task(self._poll_loop(), name="marketdata-hub-poll")
@@ -131,10 +121,8 @@ class MarketDataHub:
 
         fetcher = await get_unified_fetcher()
         await self._instrument_map.initialize()
-        await self._instrument_map.refresh_if_stale(fetcher.kite)
+        await self._instrument_map.refresh_if_stale(None)
 
-        self._kite_stream = KiteStreamAdapter(fetcher.kite, self._on_kite_tick)
-        await self._kite_stream.start()
         await self._finnhub_ws.start()
         await self._sync_stream_subscriptions()
         logger.info("MarketDataHub started (Instance ID: %s)", self._instance_id)
@@ -186,10 +174,6 @@ class MarketDataHub:
             alert_sockets = list(self._alert_connections)
             self._connections.clear()
             self._alert_connections.clear()
-            self._stream_symbols_to_token.clear()
-            self._stream_token_to_symbol.clear()
-            self._nfo_chain_last_fetch.clear()
-            self._nfo_quote_cache.clear()
             finnhub_ws = self._finnhub_ws
 
         if task:
@@ -215,9 +199,6 @@ class MarketDataHub:
 
         await self._bus.disconnect()
 
-        if self._kite_stream:
-            await self._kite_stream.stop()
-            self._kite_stream = None
         if finnhub_ws:
             await finnhub_ws.stop()
 
@@ -414,47 +395,24 @@ class MarketDataHub:
                 "ws_subscriptions": len(all_subs),
             }
 
-    def kite_stream_status(self) -> str:
-        if not self._kite_stream:
-            return "uninitialized"
-        return self._kite_stream.last_status
+    def moex_stream_status(self) -> str:
+        return "polling"
 
     async def _sync_stream_subscriptions(self) -> None:
-        if not self._kite_stream or not self._kite_stream.enabled:
-            subscriptions = await self._union_subscriptions()
-            us_symbols = {
-                token.split(":", 1)[1]
-                for token in subscriptions
-                if ":" in token and token.split(":", 1)[0] in US_MARKETS
-            }
-            await self._finnhub_ws.set_symbols(us_symbols)
-            return
-        async with self._stream_sync_lock:
-            subscriptions = await self._union_subscriptions()
-            in_symbols = sorted(sym for sym in subscriptions if sym.split(":", 1)[0] in IN_MARKETS)
-            mapping = await self._instrument_map.resolve_many(in_symbols)
-            token_set = {int(t) for t in mapping.values()}
-            await self._kite_stream.set_tokens(token_set)
-            async with self._lock:
-                self._stream_symbols_to_token = {k: int(v) for k, v in mapping.items()}
-                self._stream_token_to_symbol = {int(v): k for k, v in mapping.items()}
-            us_symbols = {
-                token.split(":", 1)[1]
-                for token in subscriptions
-                if ":" in token and token.split(":", 1)[0] in US_MARKETS
-            }
-            await self._finnhub_ws.set_symbols(us_symbols)
+        subscriptions = await self._union_subscriptions()
+        us_symbols = {
+            token.split(":", 1)[1]
+            for token in subscriptions
+            if ":" in token and token.split(":", 1)[0] in US_MARKETS
+        }
+        await self._finnhub_ws.set_symbols(us_symbols)
 
     async def _poll_loop(self) -> None:
         try:
             while self._running:
                 try:
                     tokens = await self._union_subscriptions()
-                    stream_connected = bool(self._kite_stream and self._kite_stream.connected)
                     stream_symbols: set[str] = set()
-                    if stream_connected:
-                        async with self._lock:
-                            stream_symbols = set(self._stream_symbols_to_token.keys())
                     if self._finnhub_ws.connected:
                         stream_symbols.update({t for t in tokens if t.split(":", 1)[0] in US_MARKETS})
                     poll_tokens = sorted(tokens - stream_symbols)
@@ -470,37 +428,6 @@ class MarketDataHub:
         except asyncio.CancelledError:
             logger.debug("MarketDataHub poll loop cancelled")
             raise
-
-    async def _on_kite_tick(self, tick: dict[str, Any]) -> None:
-        token = tick.get("instrument_token")
-        if not isinstance(token, int):
-            return
-        async with self._lock:
-            symbol = self._stream_token_to_symbol.get(token)
-        if not symbol:
-            return
-
-        ltp = _to_float(tick.get("last_price"))
-        if ltp is None:
-            return
-        ohlc = tick.get("ohlc") if isinstance(tick.get("ohlc"), dict) else {}
-        prev_close = _to_float(ohlc.get("close"))
-        change = (ltp - prev_close) if prev_close not in (None, 0.0) else 0.0
-        change_pct = ((change / prev_close) * 100.0) if prev_close not in (None, 0.0) else 0.0
-
-        payload = {
-            "type": "tick",
-            "symbol": symbol,
-            "ltp": ltp,
-            "change": change,
-            "change_pct": change_pct,
-            "oi": _to_float(tick.get("oi")),
-            "volume": _to_float(tick.get("volume") if tick.get("volume") is not None else tick.get("volume_traded")),
-            "ts": _now_iso(),
-            "provider": "kite",
-        }
-        market = symbol.split(":", 1)[0]
-        await self._bus.publish_tick(market, payload)
 
     async def _on_finnhub_trade(self, raw_symbol: str, price: float, volume: float, ts_ms: int) -> None:
         symbol_candidates: set[str] = set()
@@ -619,161 +546,26 @@ class MarketDataHub:
                 )
             return quotes
 
-        if market == "NFO":
-            kite_token = fetcher.kite.resolve_access_token()
-            if fetcher.kite.api_key and kite_token:
-                instruments = [f"NFO:{symbol}" for symbol in symbol_list]
-                data = await fetcher.kite.get_quote(kite_token, instruments)
-                quote_map = data.get("data") if isinstance(data, dict) else {}
-                quotes: list[dict[str, Any]] = []
-                if isinstance(quote_map, dict):
-                    for instrument, symbol in zip(instruments, symbol_list):
-                        row = quote_map.get(instrument)
-                        if not isinstance(row, dict):
-                            continue
-                        last = _to_float(row.get("last_price"))
-                        if last is None:
-                            continue
-                        ohlc = row.get("ohlc") if isinstance(row.get("ohlc"), dict) else {}
-                        close = _to_float(ohlc.get("close"))
-                        change = (last - close) if close not in (None, 0.0) else 0.0
-                        change_pct = ((change / close) * 100.0) if close not in (None, 0.0) else 0.0
+        if market in RU_MARKETS:
+            quotes = []
+            for sym in symbol_list:
+                try:
+                    quote = await get_adapter_registry().invoke("MOEX", "get_quote", sym)
+                    if isinstance(quote, QuoteResponse) and quote.price:
                         quotes.append(
                             {
-                                "symbol": symbol,
-                                "last": last,
-                                "change": change,
-                                "changePct": change_pct,
-                                "oi": _to_float(row.get("oi")),
-                                "volume": _to_float(row.get("volume")),
+                                "symbol": sym,
+                                "last": quote.price,
+                                "change": quote.change or 0.0,
+                                "changePct": quote.change_pct or 0.0,
                                 "ts": now_iso,
                             }
                         )
-                return quotes
-            if market_open_now():
-                return await self._fetch_nfo_fallback_quotes(fetcher, symbol_list, now_iso)
-            return []
-
-        if market in IN_MARKETS:
-            suffix = ".NS" if market == "NSE" else ".BO"
-            yahoo_symbols = [f"{symbol}{suffix}" for symbol in symbol_list]
-            rows = await fetcher.yahoo.get_quotes(yahoo_symbols)
-            quotes = []
-            for row in rows:
-                if not isinstance(row, dict):
-                    continue
-                raw_symbol = str(row.get("symbol") or "").upper()
-                symbol = raw_symbol.replace(".NS", "").replace(".BO", "")
-                last = _to_float(row.get("regularMarketPrice"))
-                if symbol not in symbol_list or last is None:
-                    continue
-                epoch = row.get("regularMarketTime")
-                ts_iso = now_iso
-                if isinstance(epoch, (int, float)) and epoch > 0:
-                    ts_iso = datetime.fromtimestamp(epoch, tz=timezone.utc).isoformat()
-                quotes.append(
-                    {
-                        "symbol": symbol,
-                        "last": last,
-                        "change": _to_float(row.get("regularMarketChange")) or 0.0,
-                        "changePct": _to_float(row.get("regularMarketChangePercent")) or 0.0,
-                        "ts": ts_iso,
-                    }
-                )
+                except Exception as exc:
+                    logger.debug("MOEX tick fetch failed for %s: %s", sym, exc)
             return quotes
 
         return []
-
-    async def _fetch_nfo_fallback_quotes(self, fetcher: Any, symbols: list[str], now_iso: str) -> list[dict[str, Any]]:
-        # Import lazily to avoid DB/service side effects during module import and isolated tests.
-        from backend.fno.services.option_chain_fetcher import get_option_chain_fetcher
-
-        option_specs: dict[str, tuple[str, float, str]] = {}
-        fut_underlyings: dict[str, set[str]] = {}
-        for sym in symbols:
-            m_opt = NFO_OPTION_RE.match(sym)
-            if m_opt:
-                underlying, strike_text, side = m_opt.groups()
-                try:
-                    strike = float(strike_text)
-                except ValueError:
-                    continue
-                option_specs[sym] = (underlying, strike, side)
-                continue
-            m_fut = NFO_FUT_RE.match(sym)
-            if m_fut:
-                underlying = m_fut.group(1)
-                fut_underlyings.setdefault(underlying, set()).add(sym)
-
-        fetcher_chain = get_option_chain_fetcher()
-        now_ts = time.time()
-        by_underlying: dict[str, dict[str, Any]] = {}
-        for _, (underlying, _, _) in option_specs.items():
-            cached_at = self._nfo_chain_last_fetch.get(underlying, 0.0)
-            if now_ts - cached_at >= self._nfo_fallback_poll_seconds:
-                chain = await fetcher_chain.get_option_chain(underlying, strike_range=25)
-                by_underlying[underlying] = chain
-                self._nfo_chain_last_fetch[underlying] = now_ts
-            else:
-                by_underlying[underlying] = {}
-
-        # Refresh option symbol cache from option chain snapshots.
-        for sym, (underlying, strike, side) in option_specs.items():
-            chain = by_underlying.get(underlying) or {}
-            strikes = chain.get("strikes") if isinstance(chain.get("strikes"), list) else []
-            leg = None
-            for row in strikes:
-                if not isinstance(row, dict):
-                    continue
-                if _to_float(row.get("strike_price")) != strike:
-                    continue
-                leg = row.get("ce") if side == "CE" else row.get("pe")
-                break
-            if isinstance(leg, dict):
-                self._nfo_quote_cache[sym] = {
-                    "symbol": sym,
-                    "last": _to_float(leg.get("ltp")) or 0.0,
-                    "change": _to_float(leg.get("price_change")) or 0.0,
-                    "changePct": 0.0,
-                    "oi": _to_float(leg.get("oi")),
-                    "volume": _to_float(leg.get("volume")),
-                    "ts": str(chain.get("timestamp") or now_iso),
-                }
-
-        # Approximate FUT ticks from underlying spot when kite stream is unavailable.
-        for underlying, fut_symbols in fut_underlyings.items():
-            suffix = ".NS"
-            try:
-                rows = await fetcher.yahoo.get_quotes([f"{underlying}{suffix}"])
-            except Exception:
-                rows = []
-            last = None
-            change = 0.0
-            change_pct = 0.0
-            if isinstance(rows, list) and rows and isinstance(rows[0], dict):
-                row = rows[0]
-                last = _to_float(row.get("regularMarketPrice"))
-                change = _to_float(row.get("regularMarketChange")) or 0.0
-                change_pct = _to_float(row.get("regularMarketChangePercent")) or 0.0
-            if last is None:
-                continue
-            for fut_sym in fut_symbols:
-                self._nfo_quote_cache[fut_sym] = {
-                    "symbol": fut_sym,
-                    "last": last,
-                    "change": change,
-                    "changePct": change_pct,
-                    "oi": None,
-                    "volume": None,
-                    "ts": now_iso,
-                }
-
-        out: list[dict[str, Any]] = []
-        for sym in symbols:
-            q = self._nfo_quote_cache.get(sym)
-            if q:
-                out.append(q)
-        return out
 
 
 _marketdata_hub = MarketDataHub()
